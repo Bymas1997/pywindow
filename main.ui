@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>885</width>
-    <height>637</height>
+    <width>925</width>
+    <height>713</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,10 +18,38 @@
     <item row="0" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="PlotWidget" name="inspect">
+       <widget class="QGroupBox" name="inspect">
         <property name="title">
          <string>监测画面</string>
         </property>
+        <widget class="QGraphicsView" name="graphicsView">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>20</y>
+           <width>411</width>
+           <height>281</height>
+          </rect>
+         </property>
+         <property name="backgroundBrush">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>42</red>
+            <green>207</green>
+            <blue>196</blue>
+           </color>
+          </brush>
+         </property>
+         <property name="foregroundBrush">
+          <brush brushstyle="Dense5Pattern">
+           <color alpha="255">
+            <red>0</red>
+            <green>0</green>
+            <blue>0</blue>
+           </color>
+          </brush>
+         </property>
+        </widget>
        </widget>
       </item>
       <item>
@@ -175,7 +203,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>885</width>
+     <width>925</width>
      <height>23</height>
     </rect>
    </property>
@@ -188,14 +216,6 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>PlotWidget</class>
-   <extends>QGroupBox</extends>
-   <header>plotgraph</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>
