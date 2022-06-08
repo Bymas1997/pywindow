@@ -2,29 +2,13 @@ from PySide2.QtWidgets import QApplication, QMessageBox, QPushButton, QMainWindo
 from PySide2.QtUiTools import QUiLoader
 from main_ui import Ui_MainWindow
 import numpy as np
-
+from graph import MyFigureCanvas
 import matplotlib
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 # from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 
 matplotlib.use("Qt5Agg")  # 声明使用QT5
-
-
-class MyFigureCanvas(FigureCanvas):
-
-    def __init__(self, parent=None, width=10, height=5, xlim=(0, 2500), ylim=(-2, 2), dpi=100):
-        # 创建一个Figure
-        fig = plt.Figure(figsize=(width, height), dpi=dpi, tight_layout=True)  # tight_layout: 用于去除画图时两边的空白
-
-        FigureCanvas.__init__(self, fig)  # 初始化父类
-        self.setParent(parent)
-
-        self.axes = fig.add_subplot(111)  # 添加子图
-        self.axes.spines['top'].set_visible(False)  # 去掉绘图时上面的横线
-        self.axes.spines['right'].set_visible(False)  # 去掉绘图时右面的横线
-        self.axes.set_xlim(xlim)
-        self.axes.set_ylim(ylim)
 
 
 class Stats(QMainWindow):
@@ -66,7 +50,7 @@ class Stats(QMainWindow):
         with open(flieName, 'r') as f:  # 以只读形式打开某.txt文件
             for line in f:
                 lnum += 1
-                if (lnum >= 4):  # 从第四行开始添加数据
+                if (lnum >= 1):  # 从第四行开始添加数据
                     line = line.strip('\n')  # 去掉换行符
                     line = line.split('\t')  # 分割掉两列数据之间的制表符
                     x.append(line[0])
