@@ -29,12 +29,15 @@ class Ui_MainWindow(object):
         self.graphicsView = QGraphicsView(self.inspect)
         self.graphicsView.setObjectName(u"graphicsView")
         self.graphicsView.setGeometry(QRect(10, 20, 411, 281))
-        brush = QBrush(QColor(42, 207, 196, 255))
-        brush.setStyle(Qt.SolidPattern)
+        brush = QBrush(QColor(0, 0, 0, 255))
+        brush.setStyle(Qt.NoBrush)
         self.graphicsView.setBackgroundBrush(brush)
         brush1 = QBrush(QColor(0, 0, 0, 255))
-        brush1.setStyle(Qt.Dense5Pattern)
+        brush1.setStyle(Qt.NoBrush)
         self.graphicsView.setForegroundBrush(brush1)
+        self.graphicsView_2 = QGraphicsView(self.inspect)
+        self.graphicsView_2.setObjectName(u"graphicsView_2")
+        self.graphicsView_2.setGeometry(QRect(90, 370, 256, 192))
 
         self.horizontalLayout_2.addWidget(self.inspect)
 
