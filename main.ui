@@ -50,16 +50,6 @@
           </brush>
          </property>
         </widget>
-        <widget class="QGraphicsView" name="graphicsView_2">
-         <property name="geometry">
-          <rect>
-           <x>90</x>
-           <y>370</y>
-           <width>256</width>
-           <height>192</height>
-          </rect>
-         </property>
-        </widget>
        </widget>
       </item>
       <item>
@@ -145,6 +135,16 @@
           <property name="title">
            <string>测量区域</string>
           </property>
+          <widget class="QGraphicsView" name="graphicsView_2">
+           <property name="geometry">
+            <rect>
+             <x>20</x>
+             <y>20</y>
+             <width>401</width>
+             <height>251</height>
+            </rect>
+           </property>
+          </widget>
          </widget>
         </item>
         <item>

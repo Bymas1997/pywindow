@@ -14,7 +14,7 @@ class MyFigureCanvas(FigureCanvas):
         self.setParent(parent)
 
         self.axes = fig.add_subplot(111)  # 添加子图
-        self.axes.spines['top'].set_visible(False)  # 去掉绘图时上面的横线
-        self.axes.spines['right'].set_visible(False)  # 去掉绘图时右面的横线
+        self.axes.spines['top'].set_visible(False)
+        self.axes.spines['right'].set_visible(False)
         self.axes.set_xlim(xlim)
         self.axes.set_ylim(ylim)
