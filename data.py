@@ -2,12 +2,12 @@ import numpy as np
 
 
 class myData(object):
-    def __init__(self):
-
+    def __init__(self, filename):
+        self.filename = filename
         lnum = 0
         x = []  # 创建空表存放x数据
         y = []  # 创建空表存放y数据
-        with open("profile_1.txt", 'r') as f:  # 以只读形式打开某.txt文件
+        with open(self.filename, 'r') as f:  # 以只读形式打开某.txt文件
             for line in f:
                 lnum += 1
                 if lnum >= 0:  # 从第四行开始添加数据
@@ -26,3 +26,7 @@ class myData(object):
         self.y = y
 
 
+if __name__ == '__main__':
+    filename = './profile_1.txt'
+    mydata = myData(filename)
+    print(mydata.x)

@@ -7,11 +7,12 @@ import random
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from graph import myData
+
 matplotlib.use("Qt5Agg")  # 声明使用QT5
 
 
-class FigureCanvasDemo1(FigureCanvas, myData):
-    def __init__(self):
+class FigureCanvasDemo1(FigureCanvas):
+    def __init__(self, x,y):
         fig = Figure()
         FigureCanvas.__init__(self, fig)
         self.ax = fig.add_subplot(
@@ -22,7 +23,7 @@ class FigureCanvasDemo1(FigureCanvas, myData):
 
         # 开始作图
 
-        self.ax.plot(myData.x, myData.y)
+        self.ax.plot(x, y)
         self.ax.set_title('')
         self.x = RectangleSelector(self.ax, self.onselect_xy,
                                    drawtype='box',
@@ -37,9 +38,9 @@ class FigureCanvasDemo1(FigureCanvas, myData):
         self.draw()
 
 
-class Stats(QMainWindow, myData):
+class Stats(QMainWindow):
 
-    def __init__(self):
+    def __init__(self, x, y):
         super(Stats, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -49,14 +50,14 @@ class Stats(QMainWindow, myData):
                                                      height=self.ui.graphicsView.height() / 101,
                                                      xlim=(-8, 8),
                                                      ylim=(-9, 9))  # 实例化一个FigureCanvas
-        self.plot_data()
 
-        self.plot = FigureCanvasDemo1()
+        self.plot_data()
+        self.plot = FigureCanvasDemo1(x,y)
         layout = self.ui.verticalLayout_3
         layout.addWidget(self.plot)
 
     def plot_data(self):
-        self.gv_visual_data_content.axes.plot(myData.x, myData.y)
+        self.gv_visual_data_content.axes.plot(x, y)
         self.gv_visual_data_content.axes.set_title('')
         # 加载的图形（FigureCanvas）不能直接放到graphicview控件中，必须先放到graphicScene，然后再把graphicscene放到graphicview中
         self.graphic_scene = QGraphicsScene()  # 创建一个QGraphicsScene
@@ -67,8 +68,11 @@ class Stats(QMainWindow, myData):
 
 
 if __name__ == '__main__':
-    myData = myData()
+    filename ='./profile_1.txt'
+    mydata = myData(filename)
+    x = mydata.x
+    y = mydata.y
     app = QApplication([])
-    stats = Stats()
+    stats = Stats(x, y)
     stats.show()
     app.exec_()
