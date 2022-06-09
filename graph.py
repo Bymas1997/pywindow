@@ -1,7 +1,9 @@
-
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-
+from matplotlib.figure import Figure
+from matplotlib.widgets import RectangleSelector
+import random
 import matplotlib.pyplot as plt
+from data import myData
 
 
 class MyFigureCanvas(FigureCanvas):
@@ -18,3 +20,5 @@ class MyFigureCanvas(FigureCanvas):
         self.axes.spines['right'].set_visible(False)
         self.axes.set_xlim(xlim)
         self.axes.set_ylim(ylim)
+
+

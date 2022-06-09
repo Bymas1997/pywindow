@@ -1,15 +1,43 @@
-from PySide2.QtWidgets import QApplication, QMessageBox, QPushButton, QMainWindow, QGraphicsScene, QFileDialog
-from PySide2.QtUiTools import QUiLoader
+from PySide2.QtWidgets import QApplication, QMainWindow, QGraphicsScene
 from main_ui import Ui_MainWindow
-import numpy as np
 from graph import MyFigureCanvas
 import matplotlib
 from matplotlib.widgets import RectangleSelector
-
+import random
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
+from graph import myData
 matplotlib.use("Qt5Agg")  # 声明使用QT5
 
 
-class Stats(QMainWindow):
+class FigureCanvasDemo1(FigureCanvas, myData):
+    def __init__(self):
+        fig = Figure()
+        FigureCanvas.__init__(self, fig)
+        self.ax = fig.add_subplot(
+            xlim=(-8, 8),
+            ylim=(-9, 9))
+        self.ax.spines['top'].set_visible(False)
+        self.ax.spines['right'].set_visible(False)
+
+        # 开始作图
+
+        self.ax.plot(myData.x, myData.y)
+        self.ax.set_title('')
+        self.x = RectangleSelector(self.ax, self.onselect_xy,
+                                   drawtype='box',
+                                   useblit=False,  # or True?
+                                   rectprops={'alpha': 0.5, 'facecolor': 'red'},
+                                   interactive=True)
+        self.draw()
+
+    def onselect_xy(self, *args, **kwargs):
+        self.ax.clear()
+        self.ax.plot([random.random() for _ in range(50)])
+        self.draw()
+
+
+class Stats(QMainWindow, myData):
 
     def __init__(self):
         super(Stats, self).__init__()
@@ -21,40 +49,14 @@ class Stats(QMainWindow):
                                                      height=self.ui.graphicsView.height() / 101,
                                                      xlim=(-8, 8),
                                                      ylim=(-9, 9))  # 实例化一个FigureCanvas
-        self.x = RectangleSelector(self.ax,
-                                   drawtype='box',
-                                   useblit=False,  # or True?
-                                   rectprops={'alpha': 0.5, 'facecolor': 'red'},
-                                   interactive=True)
         self.plot_data()
 
-
+        self.plot = FigureCanvasDemo1()
+        layout = self.ui.verticalLayout_3
+        layout.addWidget(self.plot)
 
     def plot_data(self):
-        lnum = 0
-        x = []  # 创建空表存放x数据
-        y = []  # 创建空表存放y数据
-        with open("profile_1.txt", 'r') as f:  # 以只读形式打开某.txt文件
-            for line in f:
-                lnum += 1
-                if lnum >= 0:  # 从第四行开始添加数据
-                    line = line.strip('\n')  # 去掉换行符
-                    line = line.split('\t')  # 分割掉两列数据之间的制表符
-                    x.append(line[0])
-                    y.append(line[1])
-
-        # NOTE：此时所得到的x列表中的数据类型是str类型，因此需要进行转换，转换为float类型
-        x = np.array(x)
-        x = x.astype(float).tolist()
-
-        y = np.array(y)
-        y = y.astype(float).tolist()
-
-        # return x, y
-        #
-        # x = np.arange(0, 2 * np.pi, 0.001)
-        # y = x * x
-        self.gv_visual_data_content.axes.plot(x, y)
+        self.gv_visual_data_content.axes.plot(myData.x, myData.y)
         self.gv_visual_data_content.axes.set_title('')
         # 加载的图形（FigureCanvas）不能直接放到graphicview控件中，必须先放到graphicScene，然后再把graphicscene放到graphicview中
         self.graphic_scene = QGraphicsScene()  # 创建一个QGraphicsScene
@@ -65,6 +67,7 @@ class Stats(QMainWindow):
 
 
 if __name__ == '__main__':
+    myData = myData()
     app = QApplication([])
     stats = Stats()
     stats.show()
