@@ -1,9 +1,5 @@
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.figure import Figure
-from matplotlib.widgets import RectangleSelector
-import random
 import matplotlib.pyplot as plt
-from data import myData
 
 
 class MyFigureCanvas(FigureCanvas):
