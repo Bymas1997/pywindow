@@ -5,8 +5,10 @@ import matplotlib
 from matplotlib.backends.backend_qt5 import NavigationToolbar2QT
 import matplotlib.pyplot as plt
 from data import myData
+import numpy as np
 
 matplotlib.use("Qt5Agg")  # 声明使用QT5
+import random
 
 
 class Stats(QMainWindow):
@@ -15,6 +17,8 @@ class Stats(QMainWindow):
         super(Stats, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        # self.cu_datax = float
+        # self.cu_datay = float
         self.x = data_x
         self.y = data_y
         self.xlim = None  # 用来存储左边原始图像的x坐标轴范围
@@ -32,6 +36,7 @@ class Stats(QMainWindow):
         self.tool = QLabel(self)  # 实例化一个标签，用来作为工具栏的容器
         self.tool.hide()  # 隐藏工具栏
         self.mpl_toolbar = NavigationToolbar2QT(self.gv_visual_data_content, self.tool)  # 实例化工具栏
+        self.ui.func1.clicked.connect(self.pick)
         self.plot_data()
 
     def plot_data(self):
@@ -61,6 +66,7 @@ class Stats(QMainWindow):
     def press(self, event):  # 鼠标在原始画布上按下将会被调用的函数，该函数获取鼠标按下的坐标
         self.startx = event.x
         self.starty = event.x
+
     def release(self, event):  # 鼠标在原始画布上释放将会被调用的函数，该函数获取鼠标按下的坐标， 同时处理获取局部图像事务
         self.endx = event.x
         self.endy = event.x
@@ -92,8 +98,34 @@ class Stats(QMainWindow):
         self.gv_visual_data_content1.axes.set_ylim(y[0], y[1])
         self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
         # 通过列表递推式将选择的矩形范围作为约束条件，对原始数据进行筛选选区数据
-        data = [i for i in zip(self.x, self.y) if x[1] >= i[0] >= x[0] and y[1] >= i[1] >= y[0]]
-        print(data)  # 输出数据
+        self.data = [i for i in zip(self.x, self.y) if x[1] >= i[0] >= x[0] and y[1] >= i[1] >= y[0]]
+
+    def pick(self):
+        self.ui.func2.setEnabled(False)
+        self.ui.func3.setEnabled(False)
+        self.ui.func4.setEnabled(False)
+        xx = np.array(x)
+        yy = np.array(y)
+
+        def _pick(event):
+            ind = event.ind
+            xxx = np.array(xx[ind])
+            cu_datax = xxx[0]
+            yyy = np.array(yy[ind])
+            cu_datay = yyy[0]
+            xy1 = (cu_datax, cu_datay)
+            print(xy1)
+
+        # cu_datax = self.cu_datax
+        #
+        # cu_datay = self.cu_datay
+
+        # self.gv_visual_data_content1.axes.text(cu_datax, cu_datay, 'a')
+
+        self.gv_visual_data_content1.axes.scatter(x, y, picker=2)
+        # self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
+
+        self.gv_visual_data_content1.mpl_connect('pick_event', _pick)
 
 
 if __name__ == '__main__':

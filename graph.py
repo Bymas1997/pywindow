@@ -16,5 +16,3 @@ class MyFigureCanvas(FigureCanvas):
         self.axes.spines['right'].set_visible(False)
         self.axes.set_xlim(xlim)
         self.axes.set_ylim(ylim)
-
-
