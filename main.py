@@ -17,8 +17,10 @@ class Stats(QMainWindow):
         super(Stats, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        # self.cu_datax = float
-        # self.cu_datay = float
+        self.cu_dataxx = None
+        self.cu_datayy = None
+        self.marked_x = [0]
+        self.marked_y = [0]
         self.x = data_x
         self.y = data_y
         self.xlim = None  # 用来存储左边原始图像的x坐标轴范围
@@ -45,7 +47,6 @@ class Stats(QMainWindow):
         self.gv_visual_data_content.axes.add_patch(self.rect)  # 添加选框范围矩形到画布, 这里需要先初始化一个矩形，后面只需对该矩形矩形参数重设即可让矩形动起来。
         self.xlim = self.gv_visual_data_content.axes.get_xlim()  # 获取原始x轴范围
         self.ylim = self.gv_visual_data_content.axes.get_ylim()  # 获取原始y轴范围
-
         self.gv_visual_data_content.axes.set_title('')
         # 加载的图形（FigureCanvas）不能直接放到graphicview控件中，必须先放到graphicScene，然后再把graphicscene放到graphicview中
         self.graphic_scene = QGraphicsScene()  # 创建一个QGraphicsScene
@@ -107,25 +108,32 @@ class Stats(QMainWindow):
         xx = np.array(x)
         yy = np.array(y)
 
-        def _pick(event):
-            ind = event.ind
-            xxx = np.array(xx[ind])
-            cu_datax = xxx[0]
-            yyy = np.array(yy[ind])
-            cu_datay = yyy[0]
-            xy1 = (cu_datax, cu_datay)
-            print(xy1)
+        self.gv_visual_data_content1.axes.scatter(x, y, picker=True, s=0.5)
+        self.gv_visual_data_content1.mpl_connect('pick_event', self._pick)
 
-        # cu_datax = self.cu_datax
-        #
-        # cu_datay = self.cu_datay
+    def _pick(self, event):
+        self.marked_x = [0]
+        self.marked_y = [0]
+        xx = np.array(x)
+        yy = np.array(y)
+        ind = event.ind
+        xxx = np.array(xx[ind])
+        cu_datax = xxx[0]
+        self.cu_dataxx = np.array(cu_datax)
+        yyy = np.array(yy[ind])
+        cu_datay = yyy[0]
+        self.cu_datayy = np.array(cu_datay)
+        xy1 = (cu_datax, cu_datay)
+        print(xy1)  # 打印选定数据
+        dataxy = str(cu_datax) + '  ' + str(cu_datay)  # text函数转换数字类型至字符串打印
+        self.gv_visual_data_content1.axes.text(self.cu_dataxx, self.cu_datayy, [dataxy])  # 打印选定数据点
+        self.gv_visual_data_content1.axes.plot(self.cu_dataxx, self.cu_datayy, '*r')
+        self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
+        self.ui.func1.clicked.connect(self._draw_line)
 
-        # self.gv_visual_data_content1.axes.text(cu_datax, cu_datay, 'a')
-
-        self.gv_visual_data_content1.axes.scatter(x, y, picker=2)
-        # self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
-
-        self.gv_visual_data_content1.mpl_connect('pick_event', _pick)
+    def _draw_line(self):
+        # self.gv_visual_data_content1.axes.plot(x,y)
+        self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
 
 
 if __name__ == '__main__':
