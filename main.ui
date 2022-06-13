@@ -50,17 +50,6 @@
           </brush>
          </property>
         </widget>
-        <widget class="QWidget" name="verticalLayoutWidget">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>310</y>
-           <width>411</width>
-           <height>221</height>
-          </rect>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_3"/>
-        </widget>
        </widget>
       </item>
       <item>
@@ -87,7 +76,7 @@
             <widget class="QFrame" name="fun_frame">
              <property name="maximumSize">
               <size>
-               <width>339</width>
+               <width>420</width>
                <height>35</height>
               </size>
              </property>
@@ -110,28 +99,35 @@
               <item>
                <widget class="QPushButton" name="func1">
                 <property name="text">
-                 <string>Button1</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="func3">
-                <property name="text">
-                 <string>Button3</string>
+                 <string>func1</string>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QPushButton" name="func2">
                 <property name="text">
-                 <string>Button2</string>
+                 <string>func2</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="func3">
+                <property name="text">
+                 <string>func3</string>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QPushButton" name="func4">
                 <property name="text">
-                 <string>Button4</string>
+                 <string>func4</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton">
+                <property name="text">
+                 <string>OK</string>
                 </property>
                </widget>
               </item>

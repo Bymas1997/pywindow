@@ -19,8 +19,8 @@ class Stats(QMainWindow):
         self.ui.setupUi(self)
         self.cu_dataxx = None
         self.cu_datayy = None
-        self.marked_x = [0]
-        self.marked_y = [0]
+        self.marked_x = []
+        self.marked_y = []
         self.x = data_x
         self.y = data_y
         self.xlim = None  # 用来存储左边原始图像的x坐标轴范围
@@ -38,7 +38,9 @@ class Stats(QMainWindow):
         self.tool = QLabel(self)  # 实例化一个标签，用来作为工具栏的容器
         self.tool.hide()  # 隐藏工具栏
         self.mpl_toolbar = NavigationToolbar2QT(self.gv_visual_data_content, self.tool)  # 实例化工具栏
+        self.ui.pushButton.clicked.connect(self._quit1)
         self.ui.func1.clicked.connect(self.pick)
+
         self.plot_data()
 
     def plot_data(self):
@@ -108,32 +110,38 @@ class Stats(QMainWindow):
         xx = np.array(x)
         yy = np.array(y)
 
-        self.gv_visual_data_content1.axes.scatter(x, y, picker=True, s=0.5)
+        self.gv_visual_data_content1.axes.scatter(x, y, picker=True, s=0.001)
         self.gv_visual_data_content1.mpl_connect('pick_event', self._pick)
 
     def _pick(self, event):
-        self.marked_x = [0]
-        self.marked_y = [0]
         xx = np.array(x)
         yy = np.array(y)
         ind = event.ind
         xxx = np.array(xx[ind])
-        cu_datax = xxx[0]
+        cu_datax = xxx[2]
         self.cu_dataxx = np.array(cu_datax)
         yyy = np.array(yy[ind])
-        cu_datay = yyy[0]
+        cu_datay = yyy[2]
         self.cu_datayy = np.array(cu_datay)
         xy1 = (cu_datax, cu_datay)
         print(xy1)  # 打印选定数据
-        dataxy = str(cu_datax) + '  ' + str(cu_datay)  # text函数转换数字类型至字符串打印
-        self.gv_visual_data_content1.axes.text(self.cu_dataxx, self.cu_datayy, [dataxy])  # 打印选定数据点
-        self.gv_visual_data_content1.axes.plot(self.cu_dataxx, self.cu_datayy, '*r')
+        dataxy = str(cu_datax) + '  ' + str(cu_datay) + '\n' + '\n'  # text函数转换数字类型至字符串打印
+        self.gv_visual_data_content1.axes.text(self.cu_dataxx, self.cu_datayy, dataxy)  # 打印选定数据点
+        self.gv_visual_data_content1.axes.plot(self.cu_dataxx, self.cu_datayy, '.r')
         self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
-        self.ui.func1.clicked.connect(self._draw_line)
+        self.marked_x.append(self.cu_dataxx)
+        self.marked_y.append(self.cu_datayy)
+        self.gv_visual_data_content1.axes.plot(self.marked_x, self.marked_y)
+        self.r = pow(pow(self.marked_x[0] - self.marked_x[1], 2) + pow(self.marked_y[0] - self.marked_y[1], 2), 0.5)
+        print(self.r)
+        r = str(self.r)
+        self.gv_visual_data_content1.axes.text((self.marked_x[0] + self.marked_x[1]) / 2,
+                                               (self.marked_y[0] + self.marked_y[1]) / 2, r)
 
-    def _draw_line(self):
-        # self.gv_visual_data_content1.axes.plot(x,y)
-        self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
+    def _quit1(self):
+        self.ui.func1.setEnabled(False)
+        self.ui.func2.setEnabled(True)
+        print(self.r)
 
 
 if __name__ == '__main__':
