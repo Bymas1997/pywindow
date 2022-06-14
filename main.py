@@ -1,4 +1,4 @@
-from PySide2.QtWidgets import QApplication, QLabel, QMainWindow, QGraphicsScene
+from PySide2.QtWidgets import QApplication, QLabel, QMainWindow, QGraphicsScene, QTableWidgetItem
 from main_ui import Ui_MainWindow
 from graph import MyFigureCanvas
 import matplotlib
@@ -17,12 +17,15 @@ class Stats(QMainWindow):
         super(Stats, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.area_x = []
+        self.area_y = []
         self.cu_dataxx = None
         self.cu_datayy = None
         self.marked_x = []
         self.marked_y = []
         self.x = data_x
         self.y = data_y
+
         self.xlim = None  # 用来存储左边原始图像的x坐标轴范围
         self.ylim = None  # 用来存储左边原始图像的y坐标轴范围
         self.rect = plt.Rectangle((0, 0), 0, 0, color="springgreen", alpha=0.2)  # 选取的范围框
@@ -40,6 +43,7 @@ class Stats(QMainWindow):
         self.mpl_toolbar = NavigationToolbar2QT(self.gv_visual_data_content, self.tool)  # 实例化工具栏
         self.ui.pushButton.clicked.connect(self._quit1)
         self.ui.func1.clicked.connect(self.pick)
+        self.ui.func3.clicked.connect(self._area)
 
         self.plot_data()
 
@@ -107,41 +111,60 @@ class Stats(QMainWindow):
         self.ui.func2.setEnabled(False)
         self.ui.func3.setEnabled(False)
         self.ui.func4.setEnabled(False)
-        xx = np.array(x)
-        yy = np.array(y)
-
         self.gv_visual_data_content1.axes.scatter(x, y, picker=True, s=0.001)
         self.gv_visual_data_content1.mpl_connect('pick_event', self._pick)
 
     def _pick(self, event):
-        xx = np.array(x)
-        yy = np.array(y)
-        ind = event.ind
-        xxx = np.array(xx[ind])
-        cu_datax = xxx[2]
-        self.cu_dataxx = np.array(cu_datax)
-        yyy = np.array(yy[ind])
-        cu_datay = yyy[2]
-        self.cu_datayy = np.array(cu_datay)
-        xy1 = (cu_datax, cu_datay)
-        print(xy1)  # 打印选定数据
-        dataxy = str(cu_datax) + '  ' + str(cu_datay) + '\n' + '\n'  # text函数转换数字类型至字符串打印
-        self.gv_visual_data_content1.axes.text(self.cu_dataxx, self.cu_datayy, dataxy)  # 打印选定数据点
-        self.gv_visual_data_content1.axes.plot(self.cu_dataxx, self.cu_datayy, '.r')
-        self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
-        self.marked_x.append(self.cu_dataxx)
-        self.marked_y.append(self.cu_datayy)
-        self.gv_visual_data_content1.axes.plot(self.marked_x, self.marked_y)
-        self.r = pow(pow(self.marked_x[0] - self.marked_x[1], 2) + pow(self.marked_y[0] - self.marked_y[1], 2), 0.5)
-        print(self.r)
-        r = str(self.r)
-        self.gv_visual_data_content1.axes.text((self.marked_x[0] + self.marked_x[1]) / 2,
-                                               (self.marked_y[0] + self.marked_y[1]) / 2, r)
+        if self.ui.func1.isEnabled():
+            xx = np.array(x)
+            yy = np.array(y)
+            ind = event.ind
+            xxx = np.array(xx[ind])
+            cu_datax = xxx[3]
+            self.cu_dataxx = np.array(cu_datax)
+            yyy = np.array(yy[ind])
+            cu_datay = yyy[3]
+            self.cu_datayy = np.array(cu_datay)
+            xy1 = (cu_datax, cu_datay)
+            print(xy1)  # 打印选定数据
+            dataxy = str(cu_datax) + '  ' + str(cu_datay) + '\n' + '\n'  # text函数转换数字类型至字符串打印
+            self.gv_visual_data_content1.axes.text(self.cu_dataxx, self.cu_datayy, dataxy)  # 打印选定数据点
+            self.gv_visual_data_content1.axes.plot(self.cu_dataxx, self.cu_datayy, '.r')
+            self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
+            self.marked_x.append(self.cu_dataxx)
+            self.marked_y.append(self.cu_datayy)
+            self.gv_visual_data_content1.axes.plot(self.marked_x, self.marked_y)
+            self.r = pow(pow(self.marked_x[0] - self.marked_x[1], 2) + pow(self.marked_y[0] - self.marked_y[1], 2), 0.5)
+            print(self.r)
+            r = str(self.r)
+            self.gv_visual_data_content1.axes.text((self.marked_x[0] + self.marked_x[1]) / 2,
+                                                   (self.marked_y[0] + self.marked_y[1]) / 2, r)
+        else:
+            pass
 
     def _quit1(self):
         self.ui.func1.setEnabled(False)
-        self.ui.func2.setEnabled(True)
-        print(self.r)
+        self.ui.func3.setEnabled(True)
+        self.ui.widget_result.item(0, 0).setText(str(self.marked_x[0]) + ',' + str(self.marked_y[0]))
+        self.ui.widget_result.setItem(0, 1, QTableWidgetItem(str(self.marked_x[0]) + ',' + str(self.marked_y[0])))
+        self.ui.widget_result.setItem(0, 2, QTableWidgetItem(str(self.r)))
+
+    def _area(self):
+        self.area = [i for i in zip(self.x, self.y) if self.marked_x[1] >= i[0] >= self.marked_x[0]]
+        for num in self.area:
+            self.area_x.append(num[0])
+            self.area_y.append(num[1])
+        self.area1 = np.trapz(self.marked_y, x=self.marked_x)
+        print(self.area1)
+        self.area2 = np.trapz(self.area_x, x=self.area_y)
+        print(self.area2)
+        area = self.area2 - self.area1
+        area_plot = str(abs(area))
+        self.gv_visual_data_content1.axes.text((self.marked_x[0] + self.marked_x[1]) / 2,
+                                               (self.marked_y[0] + self.marked_y[1] - 1) / 2, area_plot)
+        self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
+        self.ui.widget_result.setItem(0, 3, QTableWidgetItem(area_plot))
+
 
 
 if __name__ == '__main__':

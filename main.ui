@@ -180,7 +180,27 @@
            </row>
            <column>
             <property name="text">
-             <string>Value</string>
+             <string>Marked_1</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Marked_2</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>PTP_Distance</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>area</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>新建列</string>
             </property>
            </column>
            <column>
