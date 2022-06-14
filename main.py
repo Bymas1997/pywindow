@@ -1,4 +1,4 @@
-from PySide2.QtWidgets import QApplication, QLabel, QMainWindow, QGraphicsScene, QTableWidgetItem
+from PySide2.QtWidgets import QApplication, QLabel, QMainWindow, QGraphicsScene, QTableWidgetItem, QHeaderView
 from main_ui import Ui_MainWindow
 from graph import MyFigureCanvas
 import matplotlib
@@ -6,10 +6,7 @@ from matplotlib.backends.backend_qt5 import NavigationToolbar2QT
 import matplotlib.pyplot as plt
 from data import myData
 import numpy as np
-
 matplotlib.use("Qt5Agg")  # 声明使用QT5
-import random
-
 
 class Stats(QMainWindow):
 
@@ -25,7 +22,6 @@ class Stats(QMainWindow):
         self.marked_y = []
         self.x = data_x
         self.y = data_y
-
         self.xlim = None  # 用来存储左边原始图像的x坐标轴范围
         self.ylim = None  # 用来存储左边原始图像的y坐标轴范围
         self.rect = plt.Rectangle((0, 0), 0, 0, color="springgreen", alpha=0.2)  # 选取的范围框
@@ -41,10 +37,12 @@ class Stats(QMainWindow):
         self.tool = QLabel(self)  # 实例化一个标签，用来作为工具栏的容器
         self.tool.hide()  # 隐藏工具栏
         self.mpl_toolbar = NavigationToolbar2QT(self.gv_visual_data_content, self.tool)  # 实例化工具栏
-        self.ui.pushButton.clicked.connect(self._quit1)
+        self.ui.widget_result.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
+        self.ui.widget_result.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)
+        self.ui.widget_result.horizontalHeader().setSectionResizeMode(4, QHeaderView.Stretch)
+        self.ui.OK.clicked.connect(self._quit1)
         self.ui.func1.clicked.connect(self.pick)
         self.ui.func3.clicked.connect(self._area)
-
         self.plot_data()
 
     def plot_data(self):
@@ -120,10 +118,10 @@ class Stats(QMainWindow):
             yy = np.array(y)
             ind = event.ind
             xxx = np.array(xx[ind])
-            cu_datax = xxx[3]
+            cu_datax = xxx[0]
             self.cu_dataxx = np.array(cu_datax)
             yyy = np.array(yy[ind])
-            cu_datay = yyy[3]
+            cu_datay = yyy[0]
             self.cu_datayy = np.array(cu_datay)
             xy1 = (cu_datax, cu_datay)
             print(xy1)  # 打印选定数据
@@ -161,10 +159,9 @@ class Stats(QMainWindow):
         area = self.area2 - self.area1
         area_plot = str(abs(area))
         self.gv_visual_data_content1.axes.text((self.marked_x[0] + self.marked_x[1]) / 2,
-                                               (self.marked_y[0] + self.marked_y[1] - 1) / 2, area_plot)
+                                               (self.marked_y[0] + self.marked_y[1] - 0.7) / 2, area_plot)
         self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
         self.ui.widget_result.setItem(0, 3, QTableWidgetItem(area_plot))
-
 
 
 if __name__ == '__main__':
@@ -174,5 +171,5 @@ if __name__ == '__main__':
     y = mydata.y
     app = QApplication([])
     stats = Stats(x, y)
-    stats.show()
+    stats.showMaximized()
     app.exec_()
