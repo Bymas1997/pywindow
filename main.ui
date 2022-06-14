@@ -14,10 +14,10 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Main</string>
+   <string>试飞/在翼缺陷检测软件</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>1180</x>
@@ -68,12 +68,12 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../d5fabb5d055a610affa8946f7036ab7.png</normaloff>../d5fabb5d055a610affa8946f7036ab7.png</iconset>
+          <normaloff>../47d1ccf0668a3988428f7e266efb3e5.png</normaloff>../47d1ccf0668a3988428f7e266efb3e5.png</iconset>
         </property>
         <property name="iconSize">
          <size>
           <width>75</width>
-          <height>50</height>
+          <height>51</height>
          </size>
         </property>
        </widget>
@@ -91,12 +91,12 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../5b84121b99c150ba6905d4d18b74883.png</normaloff>../5b84121b99c150ba6905d4d18b74883.png</iconset>
+          <normaloff>../1c29956bd4c6e60ed05fdac386a9831.png</normaloff>../1c29956bd4c6e60ed05fdac386a9831.png</iconset>
         </property>
         <property name="iconSize">
          <size>
-          <width>75</width>
-          <height>50</height>
+          <width>100</width>
+          <height>51</height>
          </size>
         </property>
        </widget>
@@ -114,12 +114,12 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../adf634381112eb0479dc721b2e1b41a.png</normaloff>../adf634381112eb0479dc721b2e1b41a.png</iconset>
+          <normaloff>../193d89c1d2488f4def62b757506d38c.png</normaloff>../193d89c1d2488f4def62b757506d38c.png</iconset>
         </property>
         <property name="iconSize">
          <size>
           <width>75</width>
-          <height>50</height>
+          <height>51</height>
          </size>
         </property>
        </widget>
@@ -137,12 +137,12 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../1402503c04006460a70fbd868bf0111.png</normaloff>../1402503c04006460a70fbd868bf0111.png</iconset>
+          <normaloff>../52bef005adec70b7237e79137cef4fb.png</normaloff>../52bef005adec70b7237e79137cef4fb.png</iconset>
         </property>
         <property name="iconSize">
          <size>
           <width>75</width>
-          <height>50</height>
+          <height>100</height>
          </size>
         </property>
        </widget>
