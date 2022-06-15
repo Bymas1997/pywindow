@@ -66,10 +66,6 @@
         <property name="text">
          <string/>
         </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>../47d1ccf0668a3988428f7e266efb3e5.png</normaloff>../47d1ccf0668a3988428f7e266efb3e5.png</iconset>
-        </property>
         <property name="iconSize">
          <size>
           <width>75</width>
@@ -88,10 +84,6 @@
         </property>
         <property name="text">
          <string/>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>../1c29956bd4c6e60ed05fdac386a9831.png</normaloff>../1c29956bd4c6e60ed05fdac386a9831.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -112,10 +104,6 @@
         <property name="text">
          <string/>
         </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>../193d89c1d2488f4def62b757506d38c.png</normaloff>../193d89c1d2488f4def62b757506d38c.png</iconset>
-        </property>
         <property name="iconSize">
          <size>
           <width>75</width>
@@ -134,10 +122,6 @@
         </property>
         <property name="text">
          <string/>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>../52bef005adec70b7237e79137cef4fb.png</normaloff>../52bef005adec70b7237e79137cef4fb.png</iconset>
         </property>
         <property name="iconSize">
          <size>
