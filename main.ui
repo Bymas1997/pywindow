@@ -51,7 +51,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>OK</string>
+         <string>选择文件</string>
         </property>
        </widget>
        <widget class="QPushButton" name="func3">

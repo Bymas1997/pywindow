@@ -1,4 +1,7 @@
-from PySide2.QtWidgets import QApplication, QLabel, QMainWindow, QGraphicsScene, QTableWidgetItem, QHeaderView
+import os
+
+from PySide2.QtWidgets import QApplication, QLabel, QMainWindow, QGraphicsScene, QTableWidgetItem, QHeaderView, \
+    QFileDialog
 from PySide2.QtGui import QIcon
 
 from main_ui import Ui_MainWindow
@@ -14,18 +17,19 @@ matplotlib.use("Qt5Agg")  # 声明使用QT5
 
 class Stats(QMainWindow):
 
-    def __init__(self, data_x, data_y):
+    def __init__(self):
         super(Stats, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+
         self.area_x = []
         self.area_y = []
         self.cu_dataxx = None
         self.cu_datayy = None
         self.marked_x = []
         self.marked_y = []
-        self.x = data_x
-        self.y = data_y
+        self.x = None
+        self.y = None
         self.xlim = None  # 用来存储左边原始图像的x坐标轴范围
         self.ylim = None  # 用来存储左边原始图像的y坐标轴范围
         self.rect = plt.Rectangle((0, 0), 0, 0, color="springgreen", alpha=0.2)  # 选取的范围框
@@ -38,6 +42,8 @@ class Stats(QMainWindow):
                                                       height=self.ui.graphicsView_2.height() / 101,
                                                       xlim=(-8, 8),
                                                       ylim=(-9, 9))  # 实例化一个FigureCanvas
+        self.graphic_scene = QGraphicsScene()  # 创建一个QGraphicsScene
+        self.graphic_scene1 = QGraphicsScene()  # 创建一个QGraphicsScene(右边局部)
         self.tool = QLabel(self)  # 实例化一个标签，用来作为工具栏的容器
         self.tool.hide()  # 隐藏工具栏
         self.mpl_toolbar = NavigationToolbar2QT(self.gv_visual_data_content, self.tool)  # 实例化工具栏
@@ -49,25 +55,30 @@ class Stats(QMainWindow):
         self.ui.func3.setIcon(QIcon('png/func3.png'))
         self.ui.func4.setIcon(QIcon('png/func4.png'))
 
-
-
-        self.ui.OK.clicked.connect(self._quit1)
+        self.ui.OK.clicked.connect(self.file)
         self.ui.func1.clicked.connect(self.pick)
         self.ui.func3.clicked.connect(self._area)
-        self.plot_data()
+        # self.plot_data()
 
     def plot_data(self):
-        self.gv_visual_data_content.axes.plot(x, y)
-        self.gv_visual_data_content1.axes.plot(x, y)
+        self.gv_visual_data_content.axes.clear()
+        self.gv_visual_data_content1.axes.clear()
+        self.gv_visual_data_content.axes.set_ylim(-80,8)
+        self.gv_visual_data_content1.axes.set_ylim(-80,8)
+
+        self.gv_visual_data_content.axes.plot(self.x, self.y)
+        self.gv_visual_data_content.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
+
+        self.gv_visual_data_content1.axes.plot(self.x, self.y)
+        self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
+
         self.gv_visual_data_content.axes.add_patch(self.rect)  # 添加选框范围矩形到画布, 这里需要先初始化一个矩形，后面只需对该矩形矩形参数重设即可让矩形动起来。
         self.xlim = self.gv_visual_data_content.axes.get_xlim()  # 获取原始x轴范围
         self.ylim = self.gv_visual_data_content.axes.get_ylim()  # 获取原始y轴范围
         self.gv_visual_data_content.axes.set_title('')
         # 加载的图形（FigureCanvas）不能直接放到graphicview控件中，必须先放到graphicScene，然后再把graphicscene放到graphicview中
-        self.graphic_scene = QGraphicsScene()  # 创建一个QGraphicsScene
         self.graphic_scene.addWidget(self.gv_visual_data_content)
         # 把图形放到QGraphicsScene中，注意：图形是作为一个QWidget放到放到QGraphicsScene中的
-        self.graphic_scene1 = QGraphicsScene()  # 创建一个QGraphicsScene(右边局部)
         self.graphic_scene1.addWidget(self.gv_visual_data_content1)
 
         self.ui.graphicsView.setScene(self.graphic_scene)  # 把QGraphicsScene放入QGraphicsView
@@ -78,6 +89,7 @@ class Stats(QMainWindow):
         self.gv_visual_data_content.toolbar.mode = "zoom rect"  # 将隐藏的画图工具栏的选框放大模式打开
         self.gv_visual_data_content.mpl_connect('button_release_event', self.release)  # 在原始画布上的鼠标按下事件
         self.gv_visual_data_content.mpl_connect('button_press_event', self.press)  # 在原始画布上的鼠标释放事件， 该事件绑定了关键操作
+        self.ui.func1.setEnabled(True)
 
     def press(self, event):  # 鼠标在原始画布上按下将会被调用的函数，该函数获取鼠标按下的坐标
         self.startx = event.x
@@ -120,13 +132,13 @@ class Stats(QMainWindow):
         self.ui.func2.setEnabled(False)
         self.ui.func3.setEnabled(False)
         self.ui.func4.setEnabled(False)
-        self.gv_visual_data_content1.axes.scatter(x, y, picker=True, s=0.001)
+        self.gv_visual_data_content1.axes.scatter(self.x, self.y, picker=True, s=0.001)
         self.gv_visual_data_content1.mpl_connect('pick_event', self._pick)
 
     def _pick(self, event):
         if self.ui.func1.isEnabled():
-            xx = np.array(x)
-            yy = np.array(y)
+            xx = np.array(self.x)
+            yy = np.array(self.y)
             ind = event.ind
             xxx = np.array(xx[ind])
             cu_datax = xxx[1]
@@ -145,11 +157,14 @@ class Stats(QMainWindow):
             self.gv_visual_data_content1.axes.plot(self.marked_x, self.marked_y)
             self.r = pow(pow(self.marked_x[0] - self.marked_x[1], 2) + pow(self.marked_y[0] - self.marked_y[1], 2), 0.5)
             print(self.r)
-            r = 'd :' + str(self.r)+'\n' +'\n'
+            r = 'd :' + str(self.r) + '\n' + '\n'
             self.gv_visual_data_content1.axes.text((self.marked_x[0] + self.marked_x[1]) / 2,
                                                    (self.marked_y[0] + self.marked_y[1]) / 2, r)
         else:
             pass
+        if self.r is not None:
+            self._quit1()
+
 
     def _quit1(self):
         self.ui.func1.setEnabled(False)
@@ -169,20 +184,29 @@ class Stats(QMainWindow):
         print(self.area2)
         area = self.area2 - self.area1
         area_data = str(abs(area))
-        area_plot = 's :'+str(abs(area))
+        area_plot = 's :' + str(abs(area))
         self.gv_visual_data_content1.axes.text((self.marked_x[0] + self.marked_x[1]) / 2,
                                                (self.marked_y[0] + self.marked_y[1] - 0.7) / 2, area_plot)
         self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
         self.ui.widget_result.setItem(0, 3, QTableWidgetItem(area_data))
         self.ui.func3.setEnabled(False)
+        self.cu_dataxx = None
+        self.cu_datayy = None
+        self.marked_x = []
+        self.marked_y = []
+
+    def file(self):
+        filename, _ = QFileDialog.getOpenFileName(self, caption="选择文件", dir=os.getcwd(), filter="(*txt)")
+        print(filename)
+        mydata = myData(filename)
+        self.x = mydata.x
+        self.y = mydata.y
+
+        self.plot_data()
 
 
 if __name__ == '__main__':
-    filename = './profile_1.txt'
-    mydata = myData(filename)
-    x = mydata.x
-    y = mydata.y
     app = QApplication([])
-    stats = Stats(x, y)
+    stats = Stats()
     stats.showMaximized()
     app.exec_()
