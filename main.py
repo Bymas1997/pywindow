@@ -1,5 +1,4 @@
 import os
-
 from PySide2.QtWidgets import QApplication, QLabel, QMainWindow, QGraphicsScene, QTableWidgetItem, QHeaderView, \
     QFileDialog
 from PySide2.QtGui import QIcon
@@ -63,8 +62,8 @@ class Stats(QMainWindow):
     def plot_data(self):
         self.gv_visual_data_content.axes.clear()
         self.gv_visual_data_content1.axes.clear()
-        self.gv_visual_data_content.axes.set_ylim(-80,8)
-        self.gv_visual_data_content1.axes.set_ylim(-80,8)
+        self.gv_visual_data_content.axes.set_ylim(-8,8)
+        self.gv_visual_data_content1.axes.set_ylim(-8,8)
 
         self.gv_visual_data_content.axes.plot(self.x, self.y)
         self.gv_visual_data_content.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
