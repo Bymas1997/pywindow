@@ -17,253 +17,317 @@
    <string>试飞/在翼缺陷检测软件</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QGraphicsView" name="graphicsView">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>70</y>
+      <width>1141</width>
+      <height>931</height>
+     </rect>
+    </property>
+    <property name="backgroundBrush">
+     <brush brushstyle="NoBrush">
+      <color alpha="255">
+       <red>0</red>
+       <green>0</green>
+       <blue>0</blue>
+      </color>
+     </brush>
+    </property>
+    <property name="foregroundBrush">
+     <brush brushstyle="NoBrush">
+      <color alpha="255">
+       <red>0</red>
+       <green>0</green>
+       <blue>0</blue>
+      </color>
+     </brush>
+    </property>
+   </widget>
+   <widget class="QTableWidget" name="widget_result">
+    <property name="geometry">
+     <rect>
+      <x>1190</x>
+      <y>660</y>
+      <width>691</width>
+      <height>381</height>
+     </rect>
+    </property>
+    <row>
+     <property name="text">
+      <string>1</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>2</string>
+     </property>
+    </row>
+    <column>
+     <property name="text">
+      <string>Marked_1</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Marked_2</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>PTP_Distance</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>area</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Deepth</string>
+     </property>
+    </column>
+    <item row="0" column="0">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="textAlignment">
+      <set>AlignLeading|AlignVCenter</set>
+     </property>
+    </item>
+   </widget>
+   <widget class="QGraphicsView" name="graphicsView_2">
     <property name="geometry">
      <rect>
       <x>1180</x>
-      <y>20</y>
-      <width>721</width>
-      <height>1021</height>
+      <y>70</y>
+      <width>701</width>
+      <height>561</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout">
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>0</y>
+      <width>601</width>
+      <height>77</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QGroupBox" name="inspect_func_2">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="maximumSize">
+      <widget class="QPushButton" name="realtime_monitor">
+       <property name="minimumSize">
         <size>
-         <width>9999</width>
-         <height>90</height>
+         <width>75</width>
+         <height>51</height>
         </size>
        </property>
-       <property name="title">
-        <string>测量功能</string>
+       <property name="text">
+        <string>实时监测</string>
        </property>
-       <widget class="QPushButton" name="OK">
-        <property name="geometry">
-         <rect>
-          <x>590</x>
-          <y>20</y>
-          <width>75</width>
-          <height>51</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>选择文件</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="func3">
-        <property name="geometry">
-         <rect>
-          <x>370</x>
-          <y>20</y>
-          <width>75</width>
-          <height>51</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>75</width>
-          <height>51</height>
-         </size>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="func2">
-        <property name="geometry">
-         <rect>
-          <x>280</x>
-          <y>20</y>
-          <width>75</width>
-          <height>51</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>100</width>
-          <height>51</height>
-         </size>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="func4">
-        <property name="geometry">
-         <rect>
-          <x>470</x>
-          <y>20</y>
-          <width>75</width>
-          <height>51</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>75</width>
-          <height>51</height>
-         </size>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="func1">
-        <property name="geometry">
-         <rect>
-          <x>190</x>
-          <y>20</y>
-          <width>75</width>
-          <height>51</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>75</width>
-          <height>100</height>
-         </size>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>20</y>
-          <width>161</width>
-          <height>61</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
       </widget>
      </item>
      <item>
-      <widget class="QGroupBox" name="inspect_area">
-       <property name="title">
-        <string>测量区域</string>
+      <widget class="QPushButton" name="file">
+       <property name="minimumSize">
+        <size>
+         <width>75</width>
+         <height>51</height>
+        </size>
        </property>
-       <widget class="QGraphicsView" name="graphicsView_2">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>20</y>
-          <width>691</width>
-          <height>421</height>
-         </rect>
-        </property>
-       </widget>
+       <property name="text">
+        <string>文件读取</string>
+       </property>
       </widget>
      </item>
      <item>
-      <widget class="QGroupBox" name="result">
-       <property name="title">
-        <string>结果记录</string>
+      <widget class="QPushButton" name="Traking">
+       <property name="minimumSize">
+        <size>
+         <width>75</width>
+         <height>51</height>
+        </size>
        </property>
-       <widget class="QTableWidget" name="widget_result">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>30</y>
-          <width>691</width>
-          <height>381</height>
-         </rect>
-        </property>
-        <row>
-         <property name="text">
-          <string>1</string>
-         </property>
-        </row>
-        <row>
-         <property name="text">
-          <string>2</string>
-         </property>
-        </row>
-        <column>
-         <property name="text">
-          <string>Marked_1</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Marked_2</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>PTP_Distance</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>area</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Deepth</string>
-         </property>
-        </column>
-        <item row="0" column="0">
-         <property name="text">
-          <string/>
-         </property>
-         <property name="textAlignment">
-          <set>AlignLeading|AlignVCenter</set>
-         </property>
-        </item>
-       </widget>
+       <property name="text">
+        <string>追踪模式</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="setting">
+       <property name="minimumSize">
+        <size>
+         <width>75</width>
+         <height>51</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>系统设置</string>
+       </property>
       </widget>
      </item>
     </layout>
    </widget>
-   <widget class="QGroupBox" name="inspect">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>1210</x>
       <y>10</y>
-      <width>1151</width>
-      <height>1031</height>
+      <width>361</width>
+      <height>53</height>
      </rect>
     </property>
-    <property name="title">
-     <string>监测画面</string>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QPushButton" name="func1">
+       <property name="minimumSize">
+        <size>
+         <width>75</width>
+         <height>51</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>75</width>
+         <height>100</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="func2">
+       <property name="minimumSize">
+        <size>
+         <width>75</width>
+         <height>51</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>100</width>
+         <height>51</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="func3">
+       <property name="minimumSize">
+        <size>
+         <width>75</width>
+         <height>51</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>75</width>
+         <height>51</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="func4">
+       <property name="minimumSize">
+        <size>
+         <width>75</width>
+         <height>51</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>75</width>
+         <height>51</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>1610</x>
+      <y>10</y>
+      <width>239</width>
+      <height>53</height>
+     </rect>
     </property>
-    <widget class="QGraphicsView" name="graphicsView">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>30</y>
-       <width>1131</width>
-       <height>941</height>
-      </rect>
-     </property>
-     <property name="backgroundBrush">
-      <brush brushstyle="NoBrush">
-       <color alpha="255">
-        <red>0</red>
-        <green>0</green>
-        <blue>0</blue>
-       </color>
-      </brush>
-     </property>
-     <property name="foregroundBrush">
-      <brush brushstyle="NoBrush">
-       <color alpha="255">
-        <red>0</red>
-        <green>0</green>
-        <blue>0</blue>
-       </color>
-      </brush>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QPushButton" name="back">
+       <property name="minimumSize">
+        <size>
+         <width>75</width>
+         <height>51</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>撤销</string>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>75</width>
+         <height>51</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="save">
+       <property name="minimumSize">
+        <size>
+         <width>75</width>
+         <height>51</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>保存</string>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>75</width>
+         <height>51</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="delete_2">
+       <property name="minimumSize">
+        <size>
+         <width>75</width>
+         <height>51</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>删除</string>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>75</width>
+         <height>51</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
