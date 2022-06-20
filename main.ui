@@ -202,25 +202,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="func2">
-       <property name="minimumSize">
-        <size>
-         <width>75</width>
-         <height>51</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>100</width>
-         <height>51</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="func3">
        <property name="minimumSize">
         <size>
@@ -234,6 +215,25 @@
        <property name="iconSize">
         <size>
          <width>75</width>
+         <height>51</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="func2">
+       <property name="minimumSize">
+        <size>
+         <width>75</width>
+         <height>51</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>100</width>
          <height>51</height>
         </size>
        </property>

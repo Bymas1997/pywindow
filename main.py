@@ -31,6 +31,7 @@ class Stats(QMainWindow):
         self.y = None
         self.xlim = None  # 用来存储左边原始图像的x坐标轴范围
         self.ylim = None  # 用来存储左边原始图像的y坐标轴范围
+        self.distance = []
 
         self.gv_visual_data_content = MyFigureCanvas(width=self.ui.graphicsView.width() / 101,
                                                      height=self.ui.graphicsView.height() / 101,
@@ -49,17 +50,22 @@ class Stats(QMainWindow):
         self.ui.widget_result.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
         self.ui.widget_result.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)
         self.ui.widget_result.horizontalHeader().setSectionResizeMode(4, QHeaderView.Stretch)
+        # Icon
         self.ui.func1.setIcon(QIcon('png/func1.png'))
         self.ui.func2.setIcon(QIcon('png/func2.png'))
         self.ui.func3.setIcon(QIcon('png/func3.png'))
         self.ui.func4.setIcon(QIcon('png/func4.png'))
-
+        # Signal
         self.ui.file.clicked.connect(self.file)
         self.ui.func1.clicked.connect(self.pick)
         self.ui.func2.clicked.connect(self._depth)
         self.ui.func3.clicked.connect(self._area)
+        self.ui.delete_2.clicked.connect(self.delete)
+        self.ui.save.clicked.connect(self.save)
 
     def file(self):  # 文件读取
+        self.gv_visual_data_content.axes.cla()
+        self.gv_visual_data_content1.axes.cla()
         filename, _ = QFileDialog.getOpenFileName(self, caption="选择文件", dir=os.getcwd(), filter="(*txt)")
         print(filename)
         mydata = myData(filename)
@@ -69,8 +75,7 @@ class Stats(QMainWindow):
         self.plot_data()
 
     def plot_data(self):
-        self.gv_visual_data_content.axes.clear()
-        self.gv_visual_data_content1.axes.clear()
+
         self.gv_visual_data_content.axes.set_ylim(-8, 8)
         self.gv_visual_data_content1.axes.set_ylim(-8, 8)
 
@@ -174,24 +179,6 @@ class Stats(QMainWindow):
             self.ui.widget_result.setItem(0, 1, QTableWidgetItem(str(self.marked_x[1]) + ',' + str(self.marked_y[1])))
             self.ui.widget_result.setItem(0, 2, QTableWidgetItem(str(self.distance)))
 
-    def _depth(self):
-        p1 = np.array([self.marked_x[0], self.marked_y[0]])
-        p2 = np.array([self.marked_x[1], self.marked_y[1]])
-        _p1 = p2 - p1
-        self.area = np.array([i for i in zip(self.x, self.y) if self.marked_x[1] >= i[0] >= self.marked_x[0]])
-        _p2 = self.area - p1
-        cross = np.cross(_p1, _p2)
-        cross_norm = np.absolute(cross)
-        depth = cross_norm / self.distance
-        print(depth)
-        self.depth_max = max(depth)
-        depth_plot = 'd :'+str(self.depth_max)
-        self.ui.widget_result.setItem(0, 4, QTableWidgetItem(str(self.depth_max)))
-        self.gv_visual_data_content1.axes.text((self.marked_x[0] + self.marked_x[1]) / 2,
-                                               (self.marked_y[0] + self.marked_y[1] - 0.8) / 2, depth_plot)
-        self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
-
-
     def _area(self):  # func3
         print(self.marked_x)
         self.area = [i for i in zip(self.x, self.y) if self.marked_x[1] >= i[0] >= self.marked_x[0]]
@@ -209,11 +196,56 @@ class Stats(QMainWindow):
                                                (self.marked_y[0] + self.marked_y[1] - 0.7) / 2, area_plot)
         self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
         self.ui.widget_result.setItem(0, 3, QTableWidgetItem(area_data))
-        # self.ui.func3.setEnabled()
-        self.cu_dataxx = None  # 清空數據
+
+    def _depth(self):
+        p1 = np.array([self.marked_x[0], self.marked_y[0]])
+        p2 = np.array([self.marked_x[1], self.marked_y[1]])
+        _p1 = p2 - p1
+        self.area = np.array([i for i in zip(self.x, self.y) if self.marked_x[1] >= i[0] >= self.marked_x[0]])
+        _p2 = self.area - p1
+        cross = np.cross(_p1, _p2)
+        cross_norm = np.absolute(cross)
+        depth = cross_norm / self.distance
+        print(depth)
+        self.depth_max = max(depth)
+        depth_plot = 'd :' + str(self.depth_max)
+        self.ui.widget_result.setItem(0, 4, QTableWidgetItem(str(self.depth_max)))
+        self.gv_visual_data_content1.axes.text((self.marked_x[0] + self.marked_x[1]) / 2,
+                                               (self.marked_y[0] + self.marked_y[1] - 0.8) / 2, depth_plot)
+        self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
+        self.cln_data()
+
+    def cln_data(self):  # 清空數據
+        self.cu_dataxx = None  # def pink
         self.cu_datayy = None
-        # self.marked_x = []
-        # self.marked_y = []
+        self.marked_x = []
+        self.marked_y = []
+        self.area_x = []
+        self.area_y = []
+        self.cu_dataxx = None
+        self.cu_datayy = None
+        self.marked_x = []
+        self.marked_y = []
+        self.xlim = None  # 用来存储左边原始图像的x坐标轴范围
+        self.ylim = None  # 用来存储左边原始图像的y坐标轴范围
+        self.distance = []
+
+    def delete(self):
+        self.ui.widget_result.clearContents()
+        self.gv_visual_data_content1.axes.cla()
+        self.gv_visual_data_content1.axes.plot(self.x, self.y)
+        self.gv_visual_data_content1.axes.set_ylim(-8, 8)
+        self.gv_visual_data_content1.draw_idle()
+
+    def save(self):
+
+        filenames, _ = QFileDialog.getSaveFileName(self, caption='保存文件', dir='', filter='Text files (*.txt)')
+        print(filenames)
+        try:
+            with open(filenames, 'w', encoding='utf-8') as f:
+                f.write('123')
+        except:
+            pass
 
 
 if __name__ == '__main__':

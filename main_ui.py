@@ -100,19 +100,19 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_2.addWidget(self.func1)
 
-        self.func2 = QPushButton(self.layoutWidget1)
-        self.func2.setObjectName(u"func2")
-        self.func2.setMinimumSize(QSize(75, 51))
-        self.func2.setIconSize(QSize(100, 51))
-
-        self.horizontalLayout_2.addWidget(self.func2)
-
         self.func3 = QPushButton(self.layoutWidget1)
         self.func3.setObjectName(u"func3")
         self.func3.setMinimumSize(QSize(75, 51))
         self.func3.setIconSize(QSize(75, 51))
 
         self.horizontalLayout_2.addWidget(self.func3)
+
+        self.func2 = QPushButton(self.layoutWidget1)
+        self.func2.setObjectName(u"func2")
+        self.func2.setMinimumSize(QSize(75, 51))
+        self.func2.setIconSize(QSize(100, 51))
+
+        self.horizontalLayout_2.addWidget(self.func2)
 
         self.func4 = QPushButton(self.layoutWidget1)
         self.func4.setObjectName(u"func4")
@@ -189,8 +189,8 @@ class Ui_MainWindow(object):
         self.Traking.setText(QCoreApplication.translate("MainWindow", u"\u8ffd\u8e2a\u6a21\u5f0f", None))
         self.setting.setText(QCoreApplication.translate("MainWindow", u"\u7cfb\u7edf\u8bbe\u7f6e", None))
         self.func1.setText("")
-        self.func2.setText("")
         self.func3.setText("")
+        self.func2.setText("")
         self.func4.setText("")
         self.back.setText(QCoreApplication.translate("MainWindow", u"\u64a4\u9500", None))
         self.save.setText(QCoreApplication.translate("MainWindow", u"\u4fdd\u5b58", None))
