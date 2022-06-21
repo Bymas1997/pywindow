@@ -10,6 +10,7 @@ from matplotlib.backends.backend_qt5 import NavigationToolbar2QT
 import matplotlib.pyplot as plt
 from data import myData
 import numpy as np
+import xlwt
 
 matplotlib.use("Qt5Agg")  # 声明使用QT5
 
@@ -239,23 +240,14 @@ class Stats(QMainWindow):
 
     def save(self):
 
-        # filenames, _ = QFileDialog.getSaveFileName(self, caption='保存文件', dir='', filter='Text files (*.txt)')
-        # print(filenames)
-        # try:
-        #     with open(filenames, 'w', encoding='utf-8') as f:
-        #         f.write('123')
-        # except:
-        #     pass
-        # out = {}
-        # for a in range(self.ui.widget_result.columnCount()):
-        #     col = str(a)
-        #     out[col] = []
-        #     for b in range(self.ui.widget_result.rowCount()):
-        #         data = self.ui.widget_result.item(b, a).text()
-        #         line_a = data.append()
-        # print(a)
-        # print(b)
-        # print(line_a)
+        filenames, _ = QFileDialog.getSaveFileName(self, caption='保存文件', dir='', filter=".xls(*.xls)")
+        wbk = xlwt.Workbook()
+        sheet = wbk.add_sheet("sheet", cell_overwrite_ok=True)
+        for currentColumn in range(self.ui.widget_result.columnCount()):
+            for currentRow in range(self.ui.widget_result.rowCount()):
+                teext = str(self.ui.widget_result.item(currentRow, currentColumn).text())
+                sheet.write(currentRow, currentColumn, teext)
+        wbk.save(filenames)
 
 
 if __name__ == '__main__':
