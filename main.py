@@ -239,13 +239,23 @@ class Stats(QMainWindow):
 
     def save(self):
 
-        filenames, _ = QFileDialog.getSaveFileName(self, caption='保存文件', dir='', filter='Text files (*.txt)')
-        print(filenames)
-        try:
-            with open(filenames, 'w', encoding='utf-8') as f:
-                f.write('123')
-        except:
-            pass
+        # filenames, _ = QFileDialog.getSaveFileName(self, caption='保存文件', dir='', filter='Text files (*.txt)')
+        # print(filenames)
+        # try:
+        #     with open(filenames, 'w', encoding='utf-8') as f:
+        #         f.write('123')
+        # except:
+        #     pass
+        # out = {}
+        # for a in range(self.ui.widget_result.columnCount()):
+        #     col = str(a)
+        #     out[col] = []
+        #     for b in range(self.ui.widget_result.rowCount()):
+        #         data = self.ui.widget_result.item(b, a).text()
+        #         line_a = data.append()
+        # print(a)
+        # print(b)
+        # print(line_a)
 
 
 if __name__ == '__main__':
