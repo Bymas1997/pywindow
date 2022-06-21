@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from data import myData
 import numpy as np
 import xlwt
+# import sensor_test
 
 matplotlib.use("Qt5Agg")  # 声明使用QT5
 
@@ -63,6 +64,14 @@ class Stats(QMainWindow):
         self.ui.func3.clicked.connect(self._area)
         self.ui.delete_2.clicked.connect(self.delete)
         self.ui.save.clicked.connect(self.save)
+        # self.ui.realtime_monitor.clicked.connect(self.show_result)
+
+        self.ui.Traking.setEnabled(False)
+
+
+    # def sensor_test(self):
+    #     self.ui.Traking.setEnabled(True)
+    #     self.show_result()
 
     def file(self):  # 文件读取
         self.gv_visual_data_content.axes.cla()
