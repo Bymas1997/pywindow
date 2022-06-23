@@ -50,6 +50,7 @@ class Stats(QMainWindow):
         self.tool = QLabel(self)  # 实例化一个标签，用来作为工具栏的容器
         self.tool.hide()  # 隐藏工具栏
         self.mpl_toolbar = NavigationToolbar2QT(self.gv_visual_data_content, self.tool)  # 实例化工具栏
+
         self.ui.widget_result.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
         self.ui.widget_result.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)
         self.ui.widget_result.horizontalHeader().setSectionResizeMode(4, QHeaderView.Stretch)
@@ -79,7 +80,6 @@ class Stats(QMainWindow):
         self.gv_visual_data_content.axes.cla()
         self.gv_visual_data_content1.axes.cla()
         filename, _ = QFileDialog.getOpenFileName(self, caption="选择文件", dir=os.getcwd(), filter="(*txt)")
-        print(filename)
         mydata = myData(filename)
         self.x = mydata.x
         self.y = mydata.y
@@ -127,9 +127,7 @@ class Stats(QMainWindow):
         # 鼠标按下释放后获取选取的矩形范围
 
         self.rect_x = self.gv_visual_data_content.axes.get_xlim()
-        # print(x)
         self.rect_y = self.gv_visual_data_content.axes.get_ylim()
-        # print(y)
 
         # 如果鼠标按下释放都是同一点，那么此时不出现选择的矩形框（即矩形的起点与宽高都全部设置为0），反之则设置矩形的坐标范围
         if self.startx == self.endx and self.starty == self.endy:
@@ -153,6 +151,7 @@ class Stats(QMainWindow):
         # 通过列表递推式将选择的矩形范围作为约束条件，对原始数据进行筛选选区数据
         self.data = [i for i in zip(self.x, self.y) if
                      self.rect_x[1] >= i[0] >= self.rect_x[0] and self.rect_y[1] >= i[1] >= self.rect_y[0]]
+        print(self.data)
 
     def pick(self):  # func1
 
@@ -165,7 +164,7 @@ class Stats(QMainWindow):
             yy = np.array(self.y)
             ind = event.ind
             xxx = np.array(xx[ind])
-            cu_datax = xxx[0]
+            cu_datax = xxx[1]
             cu_dataxx = np.array(cu_datax)
             yyy = np.array(yy[ind])
             cu_datay = yyy[1]
@@ -181,26 +180,38 @@ class Stats(QMainWindow):
             self.gv_visual_data_content1.axes.plot(self.marked_x, self.marked_y)
             self.distance = pow(
                 pow(self.marked_x[0] - self.marked_x[1], 2) + pow(self.marked_y[0] - self.marked_y[1], 2), 0.5)
-            print(self.distance)
             r = 'd :' + str(self.distance) + '\n' + '\n'
             self.gv_visual_data_content1.axes.text((self.marked_x[0] + self.marked_x[1]) / 2,
                                                    (self.marked_y[0] + self.marked_y[1]) / 2, r)
+
         else:
             pass
         if self.distance is not None:
             self.ui.widget_result.setItem(0, 0, QTableWidgetItem(str(self.marked_x[0]) + ',' + str(self.marked_y[0])))
             self.ui.widget_result.setItem(0, 1, QTableWidgetItem(str(self.marked_x[1]) + ',' + str(self.marked_y[1])))
             self.ui.widget_result.setItem(0, 2, QTableWidgetItem(str(self.distance)))
+        if self.marked_x[1] > self.marked_x[0]:
+            bigger_x = self.marked_x[1]
+            smaller_x = self.marked_x[0]
+        else:
+            bigger_x = self.marked_x[0]
+            smaller_x = self.marked_x[1]
+        if self.marked_y[1] > self.marked_y[0]:
+            bigger_y = self.marked_y[1]
+            smaller_y = self.marked_y[0]
+        else:
+            bigger_y = self.marked_y[0]
+
+        self.marked_data = [i for i in zip(self.x, self.y) if
+                            bigger_x >= i[0] >= smaller_x and bigger_y >= i[1] >=
+                            -999]
 
     def _area(self):  # func3
-        print(self.marked_x)
-        for num in self.data:
+        for num in self.marked_data:
             self.area_x.append(num[0])
             self.area_y.append(num[1])
         area1 = np.trapz(self.marked_y, x=self.marked_x)
-        print(area1)
         area2 = np.trapz(self.area_x, x=self.area_y)
-        print(area2)
         area = area2 - area1
         area_data = str(abs(area))
         area_plot = 's :' + str(abs(area))
@@ -213,16 +224,28 @@ class Stats(QMainWindow):
         p1 = np.array([self.marked_x[0], self.marked_y[0]])
         p2 = np.array([self.marked_x[1], self.marked_y[1]])
         _p1 = p2 - p1
-        _p2 = self.data - p1
+        _p2 = self.marked_data - p1
         cross = np.cross(_p1, _p2)
         cross_norm = np.absolute(cross)
         depth = cross_norm / self.distance
-        print(depth)
         self.depth_max = max(depth)
+        max_depth_index = np.argmax(depth)
+        depth_point = self.marked_data[max_depth_index]
+        drop_foot_x, drop_foot_y = np.linalg.solve(
+            [[self.marked_y[0] - self.marked_y[1], self.marked_x[1] - self.marked_x[0]],
+             [-(self.marked_x[1]-self.marked_x[0]) / (self.marked_y[0] - self.marked_y[1]), 1]],
+            [self.marked_x[1] * self.marked_y[0] - self.marked_x[0] * self.marked_y[1],
+             (-(depth_point[0]*(self.marked_x[1]-self.marked_x[0])) / (self.marked_y[0] - self.marked_y[1])) + depth_point[1]])
+        self.gv_visual_data_content1.axes.plot([depth_point[0],drop_foot_x], [depth_point[1], drop_foot_y])
+        print(depth_point)
+        print(drop_foot_x, drop_foot_y)
         depth_plot = 'd :' + str(self.depth_max)
         self.ui.widget_result.setItem(0, 4, QTableWidgetItem(str(self.depth_max)))
         self.gv_visual_data_content1.axes.text((self.marked_x[0] + self.marked_x[1]) / 2,
                                                (self.marked_y[0] + self.marked_y[1] - 0.8) / 2, depth_plot)
+
+        self.gv_visual_data_content1.axes.set_aspect(1)
+
         self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
         # self.cln_data()
 
