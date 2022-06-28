@@ -14,7 +14,7 @@ def show_result(data_list: t.List[t.List[float]]) -> None:
             ...
         ]
     """
-    print("The number of data is", len(data_list), ".")
+    print("The number of data is", len(data_list),data_list, ".")
 
 
 # sensor_config = {

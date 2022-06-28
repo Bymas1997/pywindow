@@ -2,7 +2,7 @@ import os
 from PySide2.QtWidgets import QApplication, QLabel, QMainWindow, QGraphicsScene, QTableWidgetItem, QHeaderView, \
     QFileDialog
 from PySide2.QtGui import QIcon
-from PySide2.QtCore import QTimer
+from PySide2.QtCore import QTimer, Signal, Slot, QObject
 from ip_settings.system_settings import Widget
 from main_ui import Ui_MainWindow
 from graph import MyFigureCanvas
@@ -12,7 +12,10 @@ import matplotlib.pyplot as plt
 from data import myData
 import numpy as np
 import xlwt
-import random
+import time
+import typing as t
+from sensors import FakeSensor
+from threading import Thread
 
 # from sensor_test import show_result
 
@@ -20,6 +23,7 @@ matplotlib.use("Qt5Agg")  # 声明使用QT5
 
 
 class Stats(QMainWindow):
+    _signal = Signal(list)
 
     def __init__(self):
         super(Stats, self).__init__()
@@ -79,30 +83,109 @@ class Stats(QMainWindow):
         self.ui.func3.clicked.connect(self._area)
         self.ui.delete_2.clicked.connect(self.delete)
         self.ui.save.clicked.connect(self.save)
-        # self.ui.realtime_monitor.clicked.connect(show_result)
         self.ui.setting.clicked.connect(self.system_settings)
         self.ui.back.clicked.connect(self.back)
         self.ui.realtime_monitor.clicked.connect(self.monitor)
+        # self._signal.connect(self._render_func)
+
         self.ui.Traking.setEnabled(False)
         if self.distance is None:
             self.ui.func1.setEnabled(True)
+        self._signal.connect(self._render_func)
+
+    @Slot(list)
+    def _render_func(self, data_list: t.List[t.List[float]]) -> None:
+        """  """
+        # Matplotlib plotting ...
+        # Rendering on the MainWindow
+        # print(data_list)
+
+        self.gv_visual_data_content.axes.cla()
+        self.gv_visual_data_content.axes.set_ylim(-8, 8)
+        self.gv_visual_data_content.axes.set_xlim(-8, 8)
+        data = np.array(data_list)
+
+        self.gv_visual_data_content.axes.plot(data[:, 0], data[:, 1])
+        self.gv_visual_data_content.draw_idle()
+        # pass
+
+    def show_result(self, data_list: t.List[t.List[float]]) -> None:
+        """ Displaying the result list. The input data list has the following format:
+            data_list: [
+                [x0, y0],
+                [x1, y1],
+                ...
+            ]
+        """
+        print("The number of data is", len(data_list), ".")
+        self._signal.emit(data_list)
+
+        pass
 
     def monitor(self):
 
-        filename, _ = QFileDialog.getOpenFileName(self, caption="选择文件", dir=os.getcwd(), filter="(*txt)")
-        mydata = myData(filename)
-        self.x = mydata.x
-        self.y = mydata.y
-        self._plot_ref = None
-        self.i = 1  # cln画法 i= 0
+        def threadFunc():
 
-        self.update_plot()
-        # self.show()
-        self.timer = QTimer()
-        self.timer.setInterval(2)
-        self.timer.timeout.connect(self.update_plot)
-        self.timer.start()
-        self.ui.realtime_monitor.clicked.connect(self.timer.stop)
+            sensor = FakeSensor(
+                receiver=self.show_result,
+                data_path=r"./profile_1.txt",
+                mode="live",
+                fps=2
+            )
+
+            # while True:
+            #     inp = input("Input: ")
+            #     if inp.lower() == "q":
+            #         break
+            #     else:
+            #         sensor.trigger()
+            #     print("Loop end in one cycle.")
+
+            to_wait: bool = False
+            is_waiting: bool = False
+            is_notified: bool = False
+            start_time = time.time()
+            sensor.notify()
+            while True:
+                if time.time() - start_time <= 5.0:
+                    time.sleep(0.05)
+                elif not to_wait and not is_waiting:
+                    to_wait = True
+                elif is_waiting and 7.0 <= time.time() - start_time <= 10.0 and not is_notified:
+                    print("Trying to notify...")
+                    sensor.notify()
+                    is_notified = True
+                elif 12.0 < time.time() - start_time:
+                    break
+
+                if to_wait:
+                    print("Trying to block the thread:")
+                    to_wait = False
+                    is_waiting = True
+                    sensor.wait()
+
+            sensor.exit()
+
+        thread = Thread(target=threadFunc)
+        thread.start()
+        #
+        # """
+        #         def update_plot(self):
+        #             """
+        # filename, _ = QFileDialog.getOpenFileName(self, caption="选择文件", dir=os.getcwd(), filter="(*txt)")
+        # mydata = myData(filename)
+        # self.x = mydata.x
+        # self.y = mydata.y
+        # self._plot_ref = None
+        # self.i = 1  # cln画法 i= 0
+        #
+        # self.update_plot()
+        # # self.show()
+        # self.timer = QTimer()
+        # self.timer.setInterval(2)
+        # self.timer.timeout.connect(self.update_plot)
+        # self.timer.start()
+        # self.ui.realtime_monitor.clicked.connect(self.timer.stop)
 
     def update_plot(self):
 
@@ -123,34 +206,34 @@ class Stats(QMainWindow):
         # self.gv_visual_data_content.axes.plot(self.xdata,self.ydata)
         # self.gv_visual_data_content.draw_idle()
 
-        """
-               以上为Clear and redraw画法 
-               """
+        # """
+        #        以上为Clear and redraw画法
+        #        """
         # TODO:
-        self.gv_visual_data_content.axes.set_ylim(-8, 8)
-        self.gv_visual_data_content.axes.set_xlim(-8, 8)
-
-        self.i += 1
-
-        if self._plot_ref is None:
-            self.xdata = self.x[0:1]
-            self.ydata = self.y[0:1]
-            plot_refs = self.gv_visual_data_content.axes.plot(self.xdata, self.ydata, 'r')
-            self._plot_ref = plot_refs[0]
-        else:
-
-            print(self.i)
-            self.xdata.append(self.x[self.i])
-            self.ydata.append(self.y[self.i])
-            self._plot_ref.set_xdata(self.xdata)
-            self._plot_ref.set_ydata(self.ydata)
-
-        print(self.xdata)
-
-        self.gv_visual_data_content.draw()
-        """
-                      以上为In-place redraw画法 
-                      """
+        # self.gv_visual_data_content.axes.set_ylim(-8, 8)
+        # self.gv_visual_data_content.axes.set_xlim(-8, 8)
+        #
+        # self.i += 1
+        #
+        # if self._plot_ref is None:
+        #     self.xdata = self.x[0:1]
+        #     self.ydata = self.y[0:1]
+        #     plot_refs = self.gv_visual_data_content.axes.plot(self.xdata, self.ydata, 'r')
+        #     self._plot_ref = plot_refs[0]
+        # else:
+        #
+        #     print(self.i)
+        #     self.xdata.append(self.x[self.i])
+        #     self.ydata.append(self.y[self.i])
+        #     self._plot_ref.set_xdata(self.xdata)
+        #     self._plot_ref.set_ydata(self.ydata)
+        #
+        # print(self.xdata)
+        #
+        # self.gv_visual_data_content.draw()
+        # """
+        #               以上为In-place redraw画法
+        #               """
 
     def file(self):  # 文件读取
         self.gv_visual_data_content.axes.cla()

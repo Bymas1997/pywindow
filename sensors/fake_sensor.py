@@ -52,7 +52,6 @@ class FakeSensor(AbstractThreadSensor):
                     line = line.split('\t')  # 分割掉两列数据之间的制表符
                     data_list.append([float(line[0]), float(line[1])])
                 f.close()
-
         return data_list
 
     def connect(self, **options) -> bool:
