@@ -89,9 +89,10 @@ class Stats(QMainWindow):
         # self._signal.connect(self._render_func)
 
         self.ui.Traking.setEnabled(False)
+        self.ui.Traking.clicked.connect(self.Track)
         if self.distance is None:
             self.ui.func1.setEnabled(True)
-        self._signal.connect(self._render_func)
+        # self._signal.connect(self._render_func)
 
     @Slot(list)
     def _render_func(self, data_list: t.List[t.List[float]]) -> None:
@@ -124,70 +125,63 @@ class Stats(QMainWindow):
 
     def monitor(self):
 
-        def threadFunc():
+        # def threadFunc():
+        #
+        #     sensor = FakeSensor(
+        #         receiver=self.show_result,
+        #         data_path=r"./profile_1.txt",
+        #         mode="live",
+        #         fps=2
+        #     )
 
-            sensor = FakeSensor(
-                receiver=self.show_result,
-                data_path=r"./profile_1.txt",
-                mode="live",
-                fps=2
-            )
-
-            # while True:
-            #     inp = input("Input: ")
-            #     if inp.lower() == "q":
-            #         break
-            #     else:
-            #         sensor.trigger()
-            #     print("Loop end in one cycle.")
-
-            to_wait: bool = False
-            is_waiting: bool = False
-            is_notified: bool = False
-            start_time = time.time()
-            sensor.notify()
-            while True:
-                if time.time() - start_time <= 5.0:
-                    time.sleep(0.05)
-                elif not to_wait and not is_waiting:
-                    to_wait = True
-                elif is_waiting and 7.0 <= time.time() - start_time <= 10.0 and not is_notified:
-                    print("Trying to notify...")
-                    sensor.notify()
-                    is_notified = True
-                elif 12.0 < time.time() - start_time:
-                    break
-
-                if to_wait:
-                    print("Trying to block the thread:")
-                    to_wait = False
-                    is_waiting = True
-                    sensor.wait()
-
-            sensor.exit()
-
-        thread = Thread(target=threadFunc)
-        thread.start()
+        #     to_wait: bool = False
+        #     is_waiting: bool = False
+        #     is_notified: bool = False
+        #     start_time = time.time()
+        #     sensor.notify()
+        #     while True:
+        #         if time.time() - start_time <= 5.0:
+        #             time.sleep(0.05)
+        #         elif not to_wait and not is_waiting:
+        #             to_wait = True
+        #         elif is_waiting and 7.0 <= time.time() - start_time <= 10.0 and not is_notified:
+        #             print("Trying to notify...")
+        #             sensor.notify()
+        #             is_notified = True
+        #         elif 12.0 < time.time() - start_time:
+        #             break
+        #
+        #         if to_wait:
+        #             print("Trying to block the thread:")
+        #             to_wait = False
+        #             is_waiting = True
+        #             sensor.wait()
+        #
+        #     sensor.exit()
+        #
+        # thread = Thread(target=threadFunc)
+        # thread.start()
         #
         # """
         #         def update_plot(self):
         #             """
-        # filename, _ = QFileDialog.getOpenFileName(self, caption="选择文件", dir=os.getcwd(), filter="(*txt)")
-        # mydata = myData(filename)
-        # self.x = mydata.x
-        # self.y = mydata.y
-        # self._plot_ref = None
-        # self.i = 1  # cln画法 i= 0
-        #
-        # self.update_plot()
-        # # self.show()
-        # self.timer = QTimer()
-        # self.timer.setInterval(2)
-        # self.timer.timeout.connect(self.update_plot)
-        # self.timer.start()
-        # self.ui.realtime_monitor.clicked.connect(self.timer.stop)
+        filename, _ = QFileDialog.getOpenFileName(self, caption="选择文件", dir=os.getcwd(), filter="(*txt)")
+        mydata = myData(filename)
+        self.x = mydata.x
+        self.y = mydata.y
+        self._plot_ref = None
+        self.i = 1  # cln画法 i= 0
+
+        self.update_plot()
+        # self.show()
+        self.timer = QTimer()
+        self.timer.setInterval(2)
+        self.timer.timeout.connect(self.update_plot)
+        self.timer.start()
+        self.ui.realtime_monitor.clicked.connect(self.timer.stop)
 
     def update_plot(self):
+        self.ui.Traking.setEnabled(True)
 
         """
                Clear and redraw&In-place redraw
@@ -210,30 +204,61 @@ class Stats(QMainWindow):
         #        以上为Clear and redraw画法
         #        """
         # TODO:
-        # self.gv_visual_data_content.axes.set_ylim(-8, 8)
-        # self.gv_visual_data_content.axes.set_xlim(-8, 8)
-        #
-        # self.i += 1
-        #
-        # if self._plot_ref is None:
-        #     self.xdata = self.x[0:1]
-        #     self.ydata = self.y[0:1]
-        #     plot_refs = self.gv_visual_data_content.axes.plot(self.xdata, self.ydata, 'r')
-        #     self._plot_ref = plot_refs[0]
-        # else:
-        #
-        #     print(self.i)
-        #     self.xdata.append(self.x[self.i])
-        #     self.ydata.append(self.y[self.i])
-        #     self._plot_ref.set_xdata(self.xdata)
-        #     self._plot_ref.set_ydata(self.ydata)
-        #
-        # print(self.xdata)
-        #
-        # self.gv_visual_data_content.draw()
+
+        self.gv_visual_data_content.axes.set_ylim(-8, 8)
+        self.gv_visual_data_content.axes.set_xlim(-8, 8)
+
+        self.i += 1
+
+        if self._plot_ref is None:
+            self.xdata = self.x[0:1]
+            self.ydata = self.y[0:1]
+            plot_refs = self.gv_visual_data_content.axes.plot(self.xdata, self.ydata, 'r')
+            self._plot_ref = plot_refs[0]
+        else:
+
+            self.xdata.append(self.x[self.i])
+            self.ydata.append(self.y[self.i])
+            self._plot_ref.set_xdata(self.xdata)
+            self._plot_ref.set_ydata(self.ydata)
+
+        self.gv_visual_data_content.draw()
         # """
         #               以上为In-place redraw画法
         #               """
+
+    def Track(self):
+        plot_refs_track = self.gv_visual_data_content1.axes.plot(self.xdata, self.ydata, 'r')
+        self.plot_refs_track = plot_refs_track[0]
+
+        self.tracking_plot()
+        # self.show()
+        self.timer_track = QTimer()
+        self.timer_track.setInterval(2)
+        self.timer_track.timeout.connect(self.tracking_plot)
+        self.timer_track.start()
+        self.ui.Traking.clicked.connect(self.timer_track.stop)
+
+    def tracking_plot(self):
+        tracking_xlim = self.xdata[self.i - 2]
+        if tracking_xlim - 2 <= -8:
+            self.gv_visual_data_content1.axes.set_xlim(-8, tracking_xlim + 2)
+
+        elif tracking_xlim + 2 >= 8:
+            self.gv_visual_data_content1.axes.set_xlim((tracking_xlim - 2), 8)
+        elif -6 < tracking_xlim < 6:
+            self.gv_visual_data_content1.axes.set_xlim(tracking_xlim - 2, tracking_xlim + 2)
+        tracking_ylim = self.ydata[self.i - 2]
+        if tracking_ylim - 2 <= -8:
+            self.gv_visual_data_content1.axes.set_ylim(-8, -6)
+        elif -6 < tracking_ylim < 6:
+            self.gv_visual_data_content1.axes.set_ylim(tracking_ylim - 2, tracking_ylim + 2)
+
+        self.plot_refs_track.set_xdata(self.xdata)
+        self.plot_refs_track.set_ydata(self.ydata)
+        # self.gv_visual_data_content1.axes.cla()
+
+        self.gv_visual_data_content1.draw()
 
     def file(self):  # 文件读取
         self.gv_visual_data_content.axes.cla()
