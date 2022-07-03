@@ -3,14 +3,13 @@ import os
 from PySide2.QtWidgets import QApplication, QLabel, QMainWindow, QGraphicsScene, QTableWidgetItem, QHeaderView, \
     QFileDialog
 from PySide2.QtGui import QIcon
-from PySide2.QtCore import QTimer, Signal, Slot, QObject
+from PySide2.QtCore import Signal, Slot
 from ip_settings.system_settings import Widget
 from main_ui import Ui_MainWindow
-from graph import MyFigureCanvas
+from func.graph import MyFigureCanvas
 import matplotlib
 from matplotlib.backends.backend_qt5 import NavigationToolbar2QT
 import matplotlib.pyplot as plt
-from data import myData
 import numpy as np
 import xlwt
 import time
@@ -90,10 +89,9 @@ class Stats(QMainWindow):
         self._signal.connect(self._render_func)
 
         self.ui.Traking.setEnabled(False)
-        # self.ui.Traking.clicked.connect(self.Track)
         if self.distance is None:
             self.ui.func1.setEnabled(True)
-        # self._signal.connect(self._render_func)
+        clr_canvas = self.gv_visual_data_content.axes.cla()
 
     @Slot(list)
     def _render_func(self, data_list: t.List[t.List[float]]) -> None:
@@ -221,45 +219,10 @@ class Stats(QMainWindow):
         # """
         #               以上为In-place redraw画法
         #               """
-
-    # def Track(self):
-    #     plot_refs_track = self.gv_visual_data_content1.axes.plot(self.xdata, self.ydata, 'r')
-    #     self.plot_refs_track = plot_refs_track[0]
-    #
-    #     self.tracking_plot()
-    #     # self.show()
-    #     self.timer_track = QTimer()
-    #     self.timer_track.setInterval(2)
-    #     self.timer_track.timeout.connect(self.tracking_plot)
-    #     self.timer_track.start()
-    #     self.ui.Traking.clicked.connect(self.timer_track.stop)
-    #
-    # def tracking_plot(self):
-    #     tracking_xlim = self.xdata[self.i - 2]
-    #     if tracking_xlim - 2 <= -8:
-    #         self.gv_visual_data_content1.axes.set_xlim(-8, tracking_xlim + 2)
-    #
-    #     elif tracking_xlim + 2 >= 8:
-    #         self.gv_visual_data_content1.axes.set_xlim((tracking_xlim - 2), 8)
-    #     elif -6 < tracking_xlim < 6:
-    #         self.gv_visual_data_content1.axes.set_xlim(tracking_xlim - 2, tracking_xlim + 2)
-    #     tracking_ylim = self.ydata[self.i - 2]
-    #     if tracking_ylim - 2 <= -8:
-    #         self.gv_visual_data_content1.axes.set_ylim(-8, -6)
-    #     elif -6 < tracking_ylim < 6:
-    #         self.gv_visual_data_content1.axes.set_ylim(tracking_ylim - 2, tracking_ylim + 2)
-    #
-    #     self.plot_refs_track.set_xdata(self.xdata)
-    #     self.plot_refs_track.set_ydata(self.ydata)
-    #     # self.gv_visual_data_content1.axes.cla()
-    #
-    #     self.gv_visual_data_content1.draw()
-
     def file(self):  # 文件读取
         self.gv_visual_data_content.axes.cla()
         self.gv_visual_data_content1.axes.cla()
         filename, _ = QFileDialog.getOpenFileName(self, caption="选择文件", dir=os.getcwd(), filter="(*txt)")
-        mydata = myData(filename)
         self.x = mydata.x
         self.y = mydata.y
 

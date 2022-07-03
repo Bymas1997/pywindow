@@ -27,6 +27,6 @@ class myData(object):
 
 
 if __name__ == '__main__':
-    filename = './profile_1.txt'
+    filename = '../profile_1.txt'
     mydata = myData(filename)
     print(mydata.x)
