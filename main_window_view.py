@@ -180,7 +180,7 @@ class Stats(QMainWindow):
     def tracking(self):
         self.track_data = [i for i in zip(self.x, self.y) if
                            self.rect_x[1] >= i[0] >= self.rect_x[0] and self.rect_y[1] >= i[1] >= self.rect_y[0]]
-        a: [] = zip(self.track_data)
+        a, b = zip(*self.track_data)
         # x = self.track_data[0]
         print(a)
         # dx = np.diff(x)
