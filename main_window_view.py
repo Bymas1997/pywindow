@@ -1,5 +1,4 @@
 import os
-
 from PySide2.QtWidgets import QApplication, QLabel, QMainWindow, QGraphicsScene, QTableWidgetItem, QHeaderView, \
     QFileDialog
 from PySide2.QtGui import QIcon
@@ -16,6 +15,7 @@ import time
 import typing as t
 from sensors import FakeSensor
 from threading import Thread
+from controller import Controller
 
 # from sensor_test import show_result
 
@@ -67,6 +67,9 @@ class Stats(QMainWindow):
         self.tool = QLabel(self)  # 实例化一个标签，用来作为工具栏的容器
         self.tool.hide()  # 隐藏工具栏
         self.mpl_toolbar = NavigationToolbar2QT(self.gv_visual_data_content, self.tool)  # 实例化工具栏
+        self.gv_visual_data_content.toolbar.mode = "zoom rect"  # 将隐藏的画图工具栏的选框放大模式打开
+        self.gv_visual_data_content.mpl_connect('button_release_event', self.release)  # 在原始画布上的鼠标按下事件
+        self.gv_visual_data_content.mpl_connect('button_press_event', self.press)  # 在原始画布上的鼠标释放事件， 该事件绑定了关键操作
 
         self.ui.widget_result.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
         self.ui.widget_result.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)
@@ -87,11 +90,11 @@ class Stats(QMainWindow):
         self.ui.back.clicked.connect(self.back)
         self.ui.realtime_monitor.clicked.connect(self.monitor)
         self._signal.connect(self._render_func)
+        self.ui.Traking.clicked.connect(self.tracking)
 
-        self.ui.Traking.setEnabled(False)
+        # self.ui.Traking.setEnabled(False)
         if self.distance is None:
             self.ui.func1.setEnabled(True)
-        clr_canvas = self.gv_visual_data_content.axes.cla()
 
     @Slot(list)
     def _render_func(self, data_list: t.List[t.List[float]]) -> None:
@@ -100,6 +103,7 @@ class Stats(QMainWindow):
         self.gv_visual_data_content.axes.set_ylim(-8, 8)
         self.gv_visual_data_content.axes.set_xlim(-8, 8)
         data = np.array(data_list)
+        print(data_list)
 
         self.gv_visual_data_content.axes.plot(data[:, 0], data[:, 1])
 
@@ -173,6 +177,19 @@ class Stats(QMainWindow):
         # self.timer.start()
         # self.ui.realtime_monitor.clicked.connect(self.timer.stop)
 
+    def tracking(self):
+        self.track_data = [i for i in zip(self.x, self.y) if
+                           self.rect_x[1] >= i[0] >= self.rect_x[0] and self.rect_y[1] >= i[1] >= self.rect_y[0]]
+        a: [] = zip(self.track_data)
+        # x = self.track_data[0]
+        print(a)
+        # dx = np.diff(x)
+        # y = self.track_data[1]
+        # dy = np.diff(y)
+        # d = dy / dx
+        # self.gv_visual_data_content1.axes.plot(self.track_data[0],  d)
+        # self.gv_visual_data_content1.draw_idle()
+
     def update_plot(self):
         self.ui.Traking.setEnabled(True)
 
@@ -219,13 +236,13 @@ class Stats(QMainWindow):
         # """
         #               以上为In-place redraw画法
         #               """
+
     def file(self):  # 文件读取
         self.gv_visual_data_content.axes.cla()
         self.gv_visual_data_content1.axes.cla()
         filename, _ = QFileDialog.getOpenFileName(self, caption="选择文件", dir=os.getcwd(), filter="(*txt)")
-        self.x = mydata.x
-        self.y = mydata.y
-
+        self.x = Controller.load_file(self, filename)[0]
+        self.y = Controller.load_file(self, filename)[1]
         self.plot_data()
 
     def system_settings(self):
@@ -241,9 +258,7 @@ class Stats(QMainWindow):
         self.gv_visual_data_content.axes.add_patch(self.rect)  # 添加选框范围矩形到画布, 这里需要先初始化一个矩形，后面只需对该矩形矩形参数重设即可让矩形动起来。
         self.xlim = self.gv_visual_data_content.axes.get_xlim()  # 获取原始x轴范围
         self.ylim = self.gv_visual_data_content.axes.get_ylim()  # 获取原始y轴范围
-        self.gv_visual_data_content.toolbar.mode = "zoom rect"  # 将隐藏的画图工具栏的选框放大模式打开
-        self.gv_visual_data_content.mpl_connect('button_release_event', self.release)  # 在原始画布上的鼠标按下事件
-        self.gv_visual_data_content.mpl_connect('button_press_event', self.press)  # 在原始画布上的鼠标释放事件， 该事件绑定了关键操作
+
         self.ui.func1.setEnabled(True)
         self.gv_visual_data_content.draw_idle()
         self.gv_visual_data_content1.draw_idle()
@@ -281,9 +296,9 @@ class Stats(QMainWindow):
         self.gv_visual_data_content1.axes.set_ylim(self.rect_y[0], self.rect_y[1])
         self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
         # 通过列表递推式将选择的矩形范围作为约束条件，对原始数据进行筛选选区数据
-        self.data = [i for i in zip(self.x, self.y) if
-                     self.rect_x[1] >= i[0] >= self.rect_x[0] and self.rect_y[1] >= i[1] >= self.rect_y[0]]
-        print(self.data)
+        # self.data = [i for i in zip(self.x, self.y) if
+        #              self.rect_x[1] >= i[0] >= self.rect_x[0] and self.rect_y[1] >= i[1] >= self.rect_y[0]]
+        # print(self.data)
 
     def pick(self):  # func1
 

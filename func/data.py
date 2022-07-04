@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class myData(object):
+class File_Loader(object):
     def __init__(self,filename):
         self.name = filename
         lnum = 0
@@ -17,13 +17,13 @@ class myData(object):
                     y.append(line[1])
 
         # NOTE：此时所得到的x列表中的数据类型是str类型，因此需要进行转换，转换为float类型
-        x = np.array(x)
-        x = x.astype(float).tolist()
+        _x = np.array(x)
+        _x = _x.astype(float).tolist()
 
-        y = np.array(y)
-        y = y.astype(float).tolist()
-        self.x = x
-        self.y = y
+        _y = np.array(y)
+        _y = _y.astype(float).tolist()
+        self.x = _x
+        self.y = _y
 
 
 if __name__ == '__main__':
