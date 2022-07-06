@@ -32,18 +32,10 @@ class Stats(QMainWindow):
         self.ui.setupUi(self)
         self.ui.func1.setEnabled(False)
 
-        self.area_x = []
-        self.area_y = []
-        self.cu_dataxx = None
-        self.cu_datayy = None
         self.marked_x = []
         self.marked_y = []
-        self.x = None
-        self.y = None
-        self.xlim = None  # 用来存储左边原始图像的x坐标轴范围
-        self.ylim = None  # 用来存储左边原始图像的y坐标轴范围
-        self.distance = None
 
+        self.ptp_distance = None
         self.gv_visual_data_content = MyFigureCanvas(width=self.ui.graphicsView.width() / 101,
                                                      height=self.ui.graphicsView.height() / 101,
                                                      xlim=(-8, 8),
@@ -93,7 +85,7 @@ class Stats(QMainWindow):
         self.ui.Traking.clicked.connect(self.tracking)
 
         # self.ui.Traking.setEnabled(False)
-        if self.distance is None:
+        if self.ptp_distance is None:
             self.ui.func1.setEnabled(True)
 
     @Slot(list)
@@ -178,17 +170,28 @@ class Stats(QMainWindow):
         # self.ui.realtime_monitor.clicked.connect(self.timer.stop)
 
     def tracking(self):
+        self.gv_visual_data_content1.axes.cla()
+
         self.track_data = [i for i in zip(self.x, self.y) if
                            self.rect_x[1] >= i[0] >= self.rect_x[0] and self.rect_y[1] >= i[1] >= self.rect_y[0]]
-        a, b = zip(*self.track_data)
-        # x = self.track_data[0]
-        print(a)
-        # dx = np.diff(x)
-        # y = self.track_data[1]
-        # dy = np.diff(y)
-        # d = dy / dx
-        # self.gv_visual_data_content1.axes.plot(self.track_data[0],  d)
-        # self.gv_visual_data_content1.draw_idle()
+        x, y = zip(*self.track_data)
+
+        dx = np.diff(x)
+        dy = np.diff(y)
+        d = dy / dx
+        convolve = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                    1, 1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                    -1, -1, -1,
+                    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                    -1, -1, -1, -1, -1, -1, -1,
+                    -1, -1, -1, -1, -1, -1, -1]
+        # self.gv_visual_data_content1.axes.plot(x[0:len(x) - 1], d)
+        s = np.convolve(convolve, d, 'valid')
+        self.gv_visual_data_content1.axes.plot(x[64:len(x) - 64], s)
+        self.gv_visual_data_content1.draw_idle()
 
     def update_plot(self):
         self.ui.Traking.setEnabled(True)
@@ -241,8 +244,8 @@ class Stats(QMainWindow):
         self.gv_visual_data_content.axes.cla()
         self.gv_visual_data_content1.axes.cla()
         filename, _ = QFileDialog.getOpenFileName(self, caption="选择文件", dir=os.getcwd(), filter="(*txt)")
-        self.x = Controller.load_file(self, filename)[0]
-        self.y = Controller.load_file(self, filename)[1]
+        self.x = Controller.load_file(filename)[0]
+        self.y = Controller.load_file(filename)[1]
         self.plot_data()
 
     def system_settings(self):
@@ -302,42 +305,32 @@ class Stats(QMainWindow):
 
     def pick(self):  # func1
 
-        self.gv_visual_data_content1.axes.scatter(self.x, self.y, picker=True, s=0.001)
+        self.gv_visual_data_content1.axes.scatter(self.x, self.y, picker=1, s=0.001)
         self.gv_visual_data_content1.mpl_connect('pick_event', self._pick)
 
     def _pick(self, event):
         if self.ui.func1.isEnabled():
-            xx = np.array(self.x)
-            yy = np.array(self.y)
             ind = event.ind
-            xxx = np.array(xx[ind])
-            cu_datax = xxx[1]
-            cu_dataxx = np.array(cu_datax)
-            yyy = np.array(yy[ind])
-            cu_datay = yyy[1]
-            cu_datayy = np.array(cu_datay)
-            xy1 = (cu_datax, cu_datay)
-            print(xy1)  # 打印选定数据
-            dataxy = str(cu_datax) + '  ' + str(cu_datay) + '\n' + '\n'  # text函数转换数字类型至字符串打印
-            self.gv_visual_data_content1.axes.text(cu_dataxx, cu_datayy, dataxy)  # 打印选定数据点
-            self.gv_visual_data_content1.axes.plot(cu_dataxx, cu_datayy, '.r')
-            print(cu_dataxx, cu_datayy)
+            x, y, point_str = Controller.pick_point(self.x, self.y, ind)
+            self.marked_x.append(x)
+            self.marked_y.append(y)
+            self.gv_visual_data_content1.axes.text(x, y, point_str)  # 打印选定数据点
+            self.gv_visual_data_content1.axes.plot(x, y, '.r')
             self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
-            self.marked_x.append(cu_dataxx)
-            self.marked_y.append(cu_datayy)
+
             self.gv_visual_data_content1.axes.plot(self.marked_x, self.marked_y)
-            self.distance = pow(
-                pow(self.marked_x[0] - self.marked_x[1], 2) + pow(self.marked_y[0] - self.marked_y[1], 2), 0.5)
-            r = 'd :' + str(self.distance) + '\n' + '\n'
-            self.gv_visual_data_content1.axes.text((self.marked_x[0] + self.marked_x[1]) / 2,
-                                                   (self.marked_y[0] + self.marked_y[1]) / 2, r)
+            if len(self.marked_x) > 1:
+                self.ptp_distance = Controller.measure_distance(self.marked_x, self.marked_y)
+                r = 'd :' + str(self.ptp_distance) + '\n' + '\n'
+                self.gv_visual_data_content1.axes.text((self.marked_x[0] + self.marked_x[1]) / 2,
+                                                       (self.marked_y[0] + self.marked_y[1]) / 2, r)
 
         else:
             pass
-        if self.distance is not None:
+        if self.ptp_distance is not None:
             self.ui.widget_result.setItem(0, 0, QTableWidgetItem(str(self.marked_x[0]) + ',' + str(self.marked_y[0])))
             self.ui.widget_result.setItem(0, 1, QTableWidgetItem(str(self.marked_x[1]) + ',' + str(self.marked_y[1])))
-            self.ui.widget_result.setItem(0, 2, QTableWidgetItem(str(self.distance)))
+            self.ui.widget_result.setItem(0, 2, QTableWidgetItem(str(self.ptp_distance)))
         if self.marked_x[1] > self.marked_x[0]:
             bigger_x = self.marked_x[1]
             smaller_x = self.marked_x[0]
@@ -346,70 +339,46 @@ class Stats(QMainWindow):
             smaller_x = self.marked_x[1]
         if self.marked_y[1] > self.marked_y[0]:
             bigger_y = self.marked_y[1]
-            smaller_y = self.marked_y[0]
         else:
             bigger_y = self.marked_y[0]
 
         self.marked_data = [i for i in zip(self.x, self.y) if
                             bigger_x >= i[0] >= smaller_x and bigger_y >= i[1] >=
                             -999]
-        if self.distance is not None:
+        if self.ptp_distance is not None:
             self.ui.func1.setEnabled(False)
 
     def _area(self):  # func3
-        for num in self.marked_data:
-            self.area_x.append(num[0])
-            self.area_y.append(num[1])
-        area1 = np.trapz(self.marked_y, x=self.marked_x)
-        area2 = np.trapz(self.area_x, x=self.area_y)
-        area = area2 - area1
-        area_data = str(abs(area))
-        area_plot = 's :' + str(abs(area))
+        area_data, area_plot = Controller.measure_area(self.marked_x, self.marked_y, self.marked_data)
+
         self.gv_visual_data_content1.axes.text((self.marked_x[0] + self.marked_x[1]) / 2,
                                                (self.marked_y[0] + self.marked_y[1] - 0.7) / 2, area_plot)
         self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
         self.ui.widget_result.setItem(0, 3, QTableWidgetItem(area_data))
 
     def _depth(self):
-        p1 = np.array([self.marked_x[0], self.marked_y[0]])
-        p2 = np.array([self.marked_x[1], self.marked_y[1]])
-        _p1 = p2 - p1
-        _p2 = self.marked_data - p1
-        cross = np.cross(_p1, _p2)
-        cross_norm = np.absolute(cross)
-        depth = cross_norm / self.distance
-        self.depth_max = max(depth)
-        max_depth_index = np.argmax(depth)
-        depth_point = self.marked_data[max_depth_index]
-        drop_foot_x, drop_foot_y = np.linalg.solve(
-            [[self.marked_y[0] - self.marked_y[1], self.marked_x[1] - self.marked_x[0]],
-             [-(self.marked_x[1] - self.marked_x[0]) / (self.marked_y[0] - self.marked_y[1]), 1]],
-            [self.marked_x[1] * self.marked_y[0] - self.marked_x[0] * self.marked_y[1],
-             (-(depth_point[0] * (self.marked_x[1] - self.marked_x[0])) / (self.marked_y[0] - self.marked_y[1])) +
-             depth_point[1]])
+        depth_point, drop_foot_x, drop_foot_y, depth_max = Controller.measure_depth(self.marked_x,
+                                                                                    self.marked_y,
+                                                                                    self.marked_data,
+                                                                                    self.ptp_distance)
+
         self.gv_visual_data_content1.axes.plot([depth_point[0], drop_foot_x], [depth_point[1], drop_foot_y])
         print(depth_point)
         print(drop_foot_x, drop_foot_y)
-        depth_plot = 'd :' + str(self.depth_max)
-        self.ui.widget_result.setItem(0, 4, QTableWidgetItem(str(self.depth_max)))
+        depth_plot = 'dp :' + str(depth_max)
+        self.ui.widget_result.setItem(0, 4, QTableWidgetItem(str(depth_max)))
         self.gv_visual_data_content1.axes.text((self.marked_x[0] + self.marked_x[1]) / 2,
                                                (self.marked_y[0] + self.marked_y[1] - 0.8) / 2, depth_plot)
 
-        self.gv_visual_data_content1.axes.set_aspect(1)
+        # self.gv_visual_data_content1.axes.set_aspect(1)
 
         self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
-        # self.cln_data()
 
     def cln_data(self):  # 清空數據
 
         self.marked_x = []
         self.marked_y = []
-        self.area_x = []
-        self.area_y = []
-
-        # self.xlim = None  # 用来存储左边原始图像的x坐标轴范围
-        # self.ylim = None  # 用来存储左边原始图像的y坐标轴范围
-        self.distance = None
+        self.ptp_distance = None
 
     def delete(self):
         self.ui.widget_result.clearContents()
@@ -419,7 +388,7 @@ class Stats(QMainWindow):
         self.gv_visual_data_content1.axes.set_ylim(self.rect_y[0], self.rect_y[1])
         self.gv_visual_data_content1.draw_idle()
         self.cln_data()
-        if self.distance is None:
+        if self.ptp_distance is None:
             self.ui.func1.setEnabled(True)
 
     def save(self):
@@ -449,9 +418,7 @@ class Stats(QMainWindow):
                                                    str(self.marked_x[0]) + '  ' + str(
                                                        self.marked_y[0]) + '\n' + '\n')  # 打印选定数据点
             self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
-            self.area_x = []
-            self.area_y = []
-            self.distance = None
+            self.ptp_distance = None
         elif len(self.marked_x) == 1:
             del self.marked_x[0]
             del self.marked_y[0]
@@ -461,7 +428,7 @@ class Stats(QMainWindow):
             self.gv_visual_data_content1.axes.set_ylim(self.rect_y[0], self.rect_y[1])
             self.gv_visual_data_content1.axes.plot(self.x, self.y)
             self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
-        if self.distance is None:
+        if self.ptp_distance is None:
             self.ui.func1.setEnabled(True)
 
 

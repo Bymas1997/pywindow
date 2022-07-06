@@ -2,7 +2,7 @@ import numpy as np
 
 
 class File_Loader(object):
-    def __init__(self,filename):
+    def __init__(self, filename):
         self.name = filename
         lnum = 0
         x = []  # 创建空表存放x数据
@@ -28,5 +28,5 @@ class File_Loader(object):
 
 if __name__ == '__main__':
     filename = '../profile_1.txt'
-    mydata = myData(filename)
-    print(mydata.x)
+    # mydata = myData(filename)
+    # print(mydata.x)
