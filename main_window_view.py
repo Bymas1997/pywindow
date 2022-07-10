@@ -1,21 +1,23 @@
 import os
-from PySide2.QtWidgets import QApplication, QLabel, QMainWindow, QGraphicsScene, QTableWidgetItem, QHeaderView, \
-    QFileDialog
-from PySide2.QtGui import QIcon
-from PySide2.QtCore import Signal, Slot
-from ip_settings.system_settings import Widget
-from main_ui import Ui_MainWindow
-from func.graph import MyFigureCanvas
+import time
+import typing as t
+from threading import Thread
+
 import matplotlib
-from matplotlib.backends.backend_qt5 import NavigationToolbar2QT
 import matplotlib.pyplot as plt
 import numpy as np
 import xlwt
-import time
-import typing as t
-from sensors import FakeSensor
-from threading import Thread
+from PySide2.QtCore import Signal, Slot
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QApplication, QLabel, QMainWindow, QGraphicsScene, QTableWidgetItem, QHeaderView, \
+    QFileDialog
+from matplotlib.backends.backend_qt5 import NavigationToolbar2QT
+
 from controller import Controller
+from func.graph import MyFigureCanvas
+from ip_settings.system_settings import Widget
+from main_ui import Ui_MainWindow
+from sensors import FakeSensor
 
 # from sensor_test import show_result
 
@@ -62,6 +64,8 @@ class Stats(QMainWindow):
         self.gv_visual_data_content.toolbar.mode = "zoom rect"  # 将隐藏的画图工具栏的选框放大模式打开
         self.gv_visual_data_content.mpl_connect('button_release_event', self.release)  # 在原始画布上的鼠标按下事件
         self.gv_visual_data_content.mpl_connect('button_press_event', self.press)  # 在原始画布上的鼠标释放事件， 该事件绑定了关键操作
+        self.xlim = self.gv_visual_data_content.axes.get_xlim()  # 获取原始x轴范围
+        self.ylim = self.gv_visual_data_content.axes.get_ylim()  # 获取原始y轴范围
 
         self.ui.widget_result.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
         self.ui.widget_result.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)
@@ -175,23 +179,44 @@ class Stats(QMainWindow):
         self.track_data = [i for i in zip(self.x, self.y) if
                            self.rect_x[1] >= i[0] >= self.rect_x[0] and self.rect_y[1] >= i[1] >= self.rect_y[0]]
         x, y = zip(*self.track_data)
+        x_resh = np.array_split(x, 3)
+        y_resh = np.array_split(y, 3)
+        _n = -np.diff(y) / pow(pow(np.diff(x), 2) + pow(np.diff(y), 2), 0.5), np.diff(x) / pow(
+            pow(np.diff(x), 2) + pow(np.diff(y), 2), 0.5)
+        n = [i for i in zip(_n[0], _n[1])]
+        x_t = np.gradient(x)
+        y_t = np.gradient(y)
+        xx_t = np.gradient(x_t)
+        yy_t = np.gradient(y_t)
+        curvature_val = np.abs(xx_t * y_t - x_t * yy_t) / (x_t * x_t + y_t * y_t) ** 1.5
+        cur = curvature_val[0:len(curvature_val) - 1]
+        _k = np.diff(x) * cur / pow(pow(np.diff(x), 2) + pow(np.diff(y), 2), 0.5), np.diff(y) * cur / pow(
+            pow(np.diff(x), 2) + pow(np.diff(y), 2), 0.5)
+        k = [i for i in zip(_k[0], _k[1])]
+        k_ave = (np.cumsum(k, axis=0) / len(k))[len(k) - 1]
+        k_avee = k_ave.reshape(2, 1)
+        dot = np.dot(n, k_avee).flatten()
+        # dott = np.diff(dot)
+        print(dot)
+        s = np.convolve(np.hanning(200), dot, 'same')
 
-        dx = np.diff(x)
-        dy = np.diff(y)
-        d = dy / dx
-        convolve = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-                    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-                    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-                    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-                    1, 1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-                    -1, -1, -1,
-                    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-                    -1, -1, -1, -1, -1, -1, -1,
-                    -1, -1, -1, -1, -1, -1, -1]
-        # self.gv_visual_data_content1.axes.plot(x[0:len(x) - 1], d)
-        s = np.convolve(convolve, d, 'valid')
-        self.gv_visual_data_content1.axes.plot(x[64:len(x) - 64], s)
+        self.gv_visual_data_content1.axes.plot(x[1:len(x)], abs(s))
         self.gv_visual_data_content1.draw_idle()
+
+        #
+        # xx = np.reshape(x)
+        # dx = np.diff(x)
+        # dy = np.diff(y)
+        # print(dx
+        #       )
+        # d = dy / dx
+        # convolve = [-1, -1,-1, -1,-1, -1,-1, -1,-1, -1,-1, -1,-1, -1,-1, -1, 0, 0,0, 0, 0, 0,0, 0, 0, 0,0, 0, 0, 0,0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        # # # self.gv_visual_data_content1.axes.plot(x[0:len(x) - 1], d)
+        # s = np.convolve(convolve, dot, 'same')
+        # # print(len(s))
+        # # print(len(x))
+        # self.gv_visual_data_content1.axes.plot(x[0:len(x) - 1], abs(s))
+        # self.gv_visual_data_content1.draw_idle()
 
     def update_plot(self):
         self.ui.Traking.setEnabled(True)
@@ -259,8 +284,6 @@ class Stats(QMainWindow):
         self.gv_visual_data_content.axes.plot(self.x, self.y)
         self.gv_visual_data_content1.axes.plot(self.x, self.y)
         self.gv_visual_data_content.axes.add_patch(self.rect)  # 添加选框范围矩形到画布, 这里需要先初始化一个矩形，后面只需对该矩形矩形参数重设即可让矩形动起来。
-        self.xlim = self.gv_visual_data_content.axes.get_xlim()  # 获取原始x轴范围
-        self.ylim = self.gv_visual_data_content.axes.get_ylim()  # 获取原始y轴范围
 
         self.ui.func1.setEnabled(True)
         self.gv_visual_data_content.draw_idle()
