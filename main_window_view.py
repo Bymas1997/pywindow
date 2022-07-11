@@ -195,12 +195,12 @@ class Stats(QMainWindow):
         k = [i for i in zip(_k[0], _k[1])]
         k_ave = (np.cumsum(k, axis=0) / len(k))[len(k) - 1]
         k_avee = k_ave.reshape(2, 1)
-        dot = np.dot(n, k_avee).flatten()
-        # dott = np.diff(dot)
-        print(dot)
-        s = np.convolve(np.hanning(200), dot, 'same')
+        dot = abs(np.dot(n, k_avee).flatten())
+        con = np.convolve(dot, np.hanning(40)/20, 'same')
+        print(con)
+        # i_index = np.argwhere(con.)
 
-        self.gv_visual_data_content1.axes.plot(x[1:len(x)], abs(s))
+        self.gv_visual_data_content1.axes.plot(x[:len(x) - 1], abs(con))
         self.gv_visual_data_content1.draw_idle()
 
         #
