@@ -196,27 +196,34 @@ class Stats(QMainWindow):
         k_ave = (np.cumsum(k, axis=0) / len(k))[len(k) - 1]
         k_avee = k_ave.reshape(2, 1)
         dot = abs(np.dot(n, k_avee).flatten())
-        con = np.convolve(dot, np.hanning(40)/20, 'same')
-        print(con)
-        # i_index = np.argwhere(con.)
+        con = np.convolve(dot, np.hanning(40) / 20, 'same')
+        # target_index = list(filter(lambda n: 3.9 < n < 4.1, con))
+        # target_1 = (np.argwhere(3.9 < con).flatten()).tolist()
+        # target_2 = (np.argwhere(4.1 > con).flatten()).tolist()
+        target = np.intersect1d(np.argwhere(3.6 < con).flatten(), np.argwhere(4.4 > con).flatten())
+        target_diff = np.diff(target)
+        count = 1
+        _count = 0
+        for i in target_diff:
 
-        self.gv_visual_data_content1.axes.plot(x[:len(x) - 1], abs(con))
+            if 6 > i > 0:
+
+                count += 1
+            else:
+                count += 1
+                _count += 1
+            if _count == 3:
+                break
+        x_plot = x[target[0]-4:target[count]+4]
+        y_plot = y[target[0]-4:target[count]+4]
+
+
+        self.gv_visual_data_content1.axes.plot(x_plot,y_plot)
+
+        print(target)
+        print(target_diff)
+        # self.gv_visual_data_content1.axes.plot(x[:len(x) - 1], abs(con))
         self.gv_visual_data_content1.draw_idle()
-
-        #
-        # xx = np.reshape(x)
-        # dx = np.diff(x)
-        # dy = np.diff(y)
-        # print(dx
-        #       )
-        # d = dy / dx
-        # convolve = [-1, -1,-1, -1,-1, -1,-1, -1,-1, -1,-1, -1,-1, -1,-1, -1, 0, 0,0, 0, 0, 0,0, 0, 0, 0,0, 0, 0, 0,0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-        # # # self.gv_visual_data_content1.axes.plot(x[0:len(x) - 1], d)
-        # s = np.convolve(convolve, dot, 'same')
-        # # print(len(s))
-        # # print(len(x))
-        # self.gv_visual_data_content1.axes.plot(x[0:len(x) - 1], abs(s))
-        # self.gv_visual_data_content1.draw_idle()
 
     def update_plot(self):
         self.ui.Traking.setEnabled(True)
