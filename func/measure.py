@@ -76,6 +76,7 @@ class Measure:
         print(target_diff)
         count = 1
         _count = 0
+        miss = True
         for i in target_diff:
             if 4 > i > 0:
                 count += 1
