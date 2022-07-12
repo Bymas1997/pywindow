@@ -35,56 +35,57 @@ class Ui_MainWindow(object):
         self.graphicsView.setForegroundBrush(brush1)
         self.layoutWidget = QWidget(self.centralwidget)
         self.layoutWidget.setObjectName(u"layoutWidget")
-        self.layoutWidget.setGeometry(QRect(10, 10, 1911, 55))
+        self.layoutWidget.setGeometry(QRect(10, 10, 1901, 55))
         self.horizontalLayout_3 = QHBoxLayout(self.layoutWidget)
+        self.horizontalLayout_3.setSpacing(5)
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.horizontalLayout_3.setContentsMargins(0, 0, 0, 0)
-        self.horizontalLayout = QHBoxLayout()
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.horizontalSpacer = QSpacerItem(20, 20, QSizePolicy.Maximum, QSizePolicy.Minimum)
-
-        self.horizontalLayout.addItem(self.horizontalSpacer)
-
+        self._2 = QHBoxLayout()
+        self._2.setSpacing(4)
+        self._2.setObjectName(u"_2")
         self.realtime_monitor = QPushButton(self.layoutWidget)
         self.realtime_monitor.setObjectName(u"realtime_monitor")
+        sizePolicy = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.realtime_monitor.sizePolicy().hasHeightForWidth())
+        self.realtime_monitor.setSizePolicy(sizePolicy)
         self.realtime_monitor.setMinimumSize(QSize(75, 51))
+        self.realtime_monitor.setMaximumSize(QSize(98, 51))
 
-        self.horizontalLayout.addWidget(self.realtime_monitor)
-
-        self.horizontalSpacer_5 = QSpacerItem(20, 20, QSizePolicy.Maximum, QSizePolicy.Minimum)
-
-        self.horizontalLayout.addItem(self.horizontalSpacer_5)
+        self._2.addWidget(self.realtime_monitor)
 
         self.file = QPushButton(self.layoutWidget)
         self.file.setObjectName(u"file")
+        sizePolicy.setHeightForWidth(self.file.sizePolicy().hasHeightForWidth())
+        self.file.setSizePolicy(sizePolicy)
         self.file.setMinimumSize(QSize(75, 51))
+        self.file.setMaximumSize(QSize(98, 51))
 
-        self.horizontalLayout.addWidget(self.file)
-
-        self.horizontalSpacer_6 = QSpacerItem(20, 20, QSizePolicy.Maximum, QSizePolicy.Minimum)
-
-        self.horizontalLayout.addItem(self.horizontalSpacer_6)
+        self._2.addWidget(self.file)
 
         self.Traking = QPushButton(self.layoutWidget)
         self.Traking.setObjectName(u"Traking")
+        sizePolicy.setHeightForWidth(self.Traking.sizePolicy().hasHeightForWidth())
+        self.Traking.setSizePolicy(sizePolicy)
         self.Traking.setMinimumSize(QSize(75, 51))
+        self.Traking.setMaximumSize(QSize(98, 16777215))
 
-        self.horizontalLayout.addWidget(self.Traking)
-
-        self.horizontalSpacer_7 = QSpacerItem(20, 20, QSizePolicy.Maximum, QSizePolicy.Minimum)
-
-        self.horizontalLayout.addItem(self.horizontalSpacer_7)
+        self._2.addWidget(self.Traking)
 
         self.setting = QPushButton(self.layoutWidget)
         self.setting.setObjectName(u"setting")
+        sizePolicy.setHeightForWidth(self.setting.sizePolicy().hasHeightForWidth())
+        self.setting.setSizePolicy(sizePolicy)
         self.setting.setMinimumSize(QSize(75, 51))
+        self.setting.setMaximumSize(QSize(98, 16777215))
 
-        self.horizontalLayout.addWidget(self.setting)
+        self._2.addWidget(self.setting)
 
 
-        self.horizontalLayout_3.addLayout(self.horizontalLayout)
+        self.horizontalLayout_3.addLayout(self._2)
 
-        self.horizontalSpacer_4 = QSpacerItem(80, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_4 = QSpacerItem(700, 20, QSizePolicy.Minimum, QSizePolicy.Minimum)
 
         self.horizontalLayout_3.addItem(self.horizontalSpacer_4)
 
@@ -118,7 +119,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_2.addWidget(self.func4)
 
-        self.horizontalSpacer_3 = QSpacerItem(60, 20, QSizePolicy.Minimum, QSizePolicy.Minimum)
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Minimum, QSizePolicy.Minimum)
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer_3)
 
@@ -143,13 +144,16 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_2.addWidget(self.delete_2)
 
-        self.horizontalSpacer_2 = QSpacerItem(50, 20, QSizePolicy.Maximum, QSizePolicy.Minimum)
+        self.horizontalSpacer_2 = QSpacerItem(50, 20, QSizePolicy.Minimum, QSizePolicy.Minimum)
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer_2)
 
 
         self.horizontalLayout_3.addLayout(self.horizontalLayout_2)
 
+        self.horizontalLayout_3.setStretch(0, 1)
+        self.horizontalLayout_3.setStretch(1, 2)
+        self.horizontalLayout_3.setStretch(2, 1)
         self.graphicsView_2 = QGraphicsView(self.centralwidget)
         self.graphicsView_2.setObjectName(u"graphicsView_2")
         self.graphicsView_2.setGeometry(QRect(1190, 80, 721, 401))
@@ -176,16 +180,8 @@ class Ui_MainWindow(object):
         __qtablewidgetitem7.setTextAlignment(Qt.AlignLeading|Qt.AlignVCenter);
         self.widget_result.setItem(0, 0, __qtablewidgetitem7)
         self.widget_result.setObjectName(u"widget_result")
-        self.widget_result.setGeometry(QRect(1190, 490, 721, 551))
+        self.widget_result.setGeometry(QRect(1190, 490, 721, 501))
         MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QMenuBar(MainWindow)
-        self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1920, 23))
-        self.menu = QMenu(self.menubar)
-        self.menu.setObjectName(u"menu")
-        MainWindow.setMenuBar(self.menubar)
-
-        self.menubar.addAction(self.menu.menuAction())
 
         self.retranslateUi(MainWindow)
 
@@ -224,6 +220,5 @@ class Ui_MainWindow(object):
         self.widget_result.setSortingEnabled(False)
         self.widget_result.setSortingEnabled(__sortingEnabled)
 
-        self.menu.setTitle(QCoreApplication.translate("MainWindow", u"\u5f00\u59cb\u76d1\u63a7", None))
     # retranslateUi
 

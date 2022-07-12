@@ -1,22 +1,24 @@
+from PySide2.QtCore import Signal, Slot
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QApplication, QMainWindow, QGraphicsScene, QLabel, QTableWidgetItem, QHeaderView, \
+    QFileDialog, QMessageBox
+from main_ui import Ui_MainWindow
 import os
 import time
 import typing as t
 from threading import Thread
 
-import matplotlib
-import matplotlib.pyplot as plt
+
 import numpy as np
 import xlwt
-from PySide2.QtCore import Signal, Slot
-from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QApplication, QLabel, QMainWindow, QGraphicsScene, QTableWidgetItem, QHeaderView, \
-    QFileDialog
+
+import matplotlib
+import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5 import NavigationToolbar2QT
 
 from controller import Controller
 from func.graph import MyFigureCanvas
 from ip_settings.system_settings import Widget
-from main_ui import Ui_MainWindow
 from sensors import FakeSensor
 
 # from sensor_test import show_result
@@ -36,6 +38,8 @@ class Stats(QMainWindow):
 
         self.marked_x = []
         self.marked_y = []
+        self._x_plot = None
+        self._y_plot = None
 
         self.ptp_distance = None
         self.gv_visual_data_content = MyFigureCanvas(width=self.ui.graphicsView.width() / 101,
@@ -174,56 +178,7 @@ class Stats(QMainWindow):
         # self.ui.realtime_monitor.clicked.connect(self.timer.stop)
 
     def tracking(self):
-        self.gv_visual_data_content1.axes.cla()
-
-        self.track_data = [i for i in zip(self.x, self.y) if
-                           self.rect_x[1] >= i[0] >= self.rect_x[0] and self.rect_y[1] >= i[1] >= self.rect_y[0]]
-        x, y = zip(*self.track_data)
-        x_resh = np.array_split(x, 3)
-        y_resh = np.array_split(y, 3)
-        _n = -np.diff(y) / pow(pow(np.diff(x), 2) + pow(np.diff(y), 2), 0.5), np.diff(x) / pow(
-            pow(np.diff(x), 2) + pow(np.diff(y), 2), 0.5)
-        n = [i for i in zip(_n[0], _n[1])]
-        x_t = np.gradient(x)
-        y_t = np.gradient(y)
-        xx_t = np.gradient(x_t)
-        yy_t = np.gradient(y_t)
-        curvature_val = np.abs(xx_t * y_t - x_t * yy_t) / (x_t * x_t + y_t * y_t) ** 1.5
-        cur = curvature_val[0:len(curvature_val) - 1]
-        _k = np.diff(x) * cur / pow(pow(np.diff(x), 2) + pow(np.diff(y), 2), 0.5), np.diff(y) * cur / pow(
-            pow(np.diff(x), 2) + pow(np.diff(y), 2), 0.5)
-        k = [i for i in zip(_k[0], _k[1])]
-        k_ave = (np.cumsum(k, axis=0) / len(k))[len(k) - 1]
-        k_avee = k_ave.reshape(2, 1)
-        dot = abs(np.dot(n, k_avee).flatten())
-        con = np.convolve(dot, np.hanning(40) / 20, 'same')
-        # target_index = list(filter(lambda n: 3.9 < n < 4.1, con))
-        # target_1 = (np.argwhere(3.9 < con).flatten()).tolist()
-        # target_2 = (np.argwhere(4.1 > con).flatten()).tolist()
-        target = np.intersect1d(np.argwhere(3.6 < con).flatten(), np.argwhere(4.4 > con).flatten())
-        target_diff = np.diff(target)
-        count = 1
-        _count = 0
-        for i in target_diff:
-
-            if 6 > i > 0:
-
-                count += 1
-            else:
-                count += 1
-                _count += 1
-            if _count == 3:
-                break
-        x_plot = x[target[0]-4:target[count]+4]
-        y_plot = y[target[0]-4:target[count]+4]
-
-
-        self.gv_visual_data_content1.axes.plot(x_plot,y_plot)
-
-        print(target)
-        print(target_diff)
-        # self.gv_visual_data_content1.axes.plot(x[:len(x) - 1], abs(con))
-        self.gv_visual_data_content1.draw_idle()
+        pass
 
     def update_plot(self):
         self.ui.Traking.setEnabled(True)
@@ -287,14 +242,11 @@ class Stats(QMainWindow):
     def plot_data(self):
 
         self.gv_visual_data_content.axes.set_ylim(-8, 8)
-        self.gv_visual_data_content1.axes.set_ylim(-8, 8)
         self.gv_visual_data_content.axes.plot(self.x, self.y)
-        self.gv_visual_data_content1.axes.plot(self.x, self.y)
         self.gv_visual_data_content.axes.add_patch(self.rect)  # 添加选框范围矩形到画布, 这里需要先初始化一个矩形，后面只需对该矩形矩形参数重设即可让矩形动起来。
 
         self.ui.func1.setEnabled(True)
         self.gv_visual_data_content.draw_idle()
-        self.gv_visual_data_content1.draw_idle()
 
     def press(self, event):  # 鼠标在原始画布上按下将会被调用的函数，该函数获取鼠标按下的坐标
         self.startx = event.x
@@ -325,9 +277,23 @@ class Stats(QMainWindow):
         self.gv_visual_data_content.axes.set_xlim(self.xlim)
         self.gv_visual_data_content.axes.set_ylim(self.ylim)
         # 我们对原始图像坐标轴约束在选取的矩形坐标范围，即右边局部图像
-        self.gv_visual_data_content1.axes.set_xlim(self.rect_x[0], self.rect_x[1])
-        self.gv_visual_data_content1.axes.set_ylim(self.rect_y[0], self.rect_y[1])
-        self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
+        self.gv_visual_data_content1.axes.cla()
+        roi_data = [i for i in zip(self.x, self.y) if
+                    self.rect_x[1] >= i[0] >= self.rect_x[0] and self.rect_y[1] >= i[1] >= self.rect_y[0]]
+        x, y = zip(*roi_data)
+        self._x_plot, self._y_plot, miss = Controller.roi_select(x, y)
+        print(self._x_plot, self._y_plot)
+        if self._x_plot != 'fail':
+            if miss:
+
+                self.gv_visual_data_content1.axes.plot(self._x_plot, self._y_plot)
+                self.gv_visual_data_content1.draw_idle()
+            else:
+                QMessageBox.information(self, 'error', 'roi选择错误')
+        else:
+            QMessageBox.information(self, 'error', '请重新选择')
+
+        # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
         # 通过列表递推式将选择的矩形范围作为约束条件，对原始数据进行筛选选区数据
         # self.data = [i for i in zip(self.x, self.y) if
         #              self.rect_x[1] >= i[0] >= self.rect_x[0] and self.rect_y[1] >= i[1] >= self.rect_y[0]]
@@ -335,13 +301,14 @@ class Stats(QMainWindow):
 
     def pick(self):  # func1
 
-        self.gv_visual_data_content1.axes.scatter(self.x, self.y, picker=1, s=0.001)
+        self.gv_visual_data_content1.axes.scatter(self._x_plot, self._y_plot, picker=1, s=0.001)
         self.gv_visual_data_content1.mpl_connect('pick_event', self._pick)
 
     def _pick(self, event):
         if self.ui.func1.isEnabled():
             ind = event.ind
-            x, y, point_str = Controller.pick_point(self.x, self.y, ind)
+            print(ind)
+            x, y, point_str = Controller.pick_point(self._x_plot, self._y_plot, ind)
             self.marked_x.append(x)
             self.marked_y.append(y)
             self.gv_visual_data_content1.axes.text(x, y, point_str)  # 打印选定数据点
@@ -413,9 +380,8 @@ class Stats(QMainWindow):
     def delete(self):
         self.ui.widget_result.clearContents()
         self.gv_visual_data_content1.axes.cla()
-        self.gv_visual_data_content1.axes.plot(self.x, self.y)
-        self.gv_visual_data_content1.axes.set_xlim(self.rect_x[0], self.rect_x[1])
-        self.gv_visual_data_content1.axes.set_ylim(self.rect_y[0], self.rect_y[1])
+        self.gv_visual_data_content1.axes.plot(self._x_plot, self._y_plot,)
+
         self.gv_visual_data_content1.draw_idle()
         self.cln_data()
         if self.ptp_distance is None:
@@ -440,9 +406,7 @@ class Stats(QMainWindow):
             self.ui.widget_result.clearContents()
             self.ui.widget_result.setItem(0, 0, QTableWidgetItem(str(self.marked_x[0]) + ',' + str(self.marked_y[0])))
             self.gv_visual_data_content1.axes.cla()
-            self.gv_visual_data_content1.axes.set_xlim(self.rect_x[0], self.rect_x[1])
-            self.gv_visual_data_content1.axes.set_ylim(self.rect_y[0], self.rect_y[1])
-            self.gv_visual_data_content1.axes.plot(self.x, self.y)
+            self.gv_visual_data_content1.axes.plot(self._x_plot, self._y_plot,)
             self.gv_visual_data_content1.axes.plot(self.marked_x[0], self.marked_y[0], '.r')
             self.gv_visual_data_content1.axes.text(self.marked_x[0], self.marked_y[0],
                                                    str(self.marked_x[0]) + '  ' + str(
@@ -454,9 +418,8 @@ class Stats(QMainWindow):
             del self.marked_y[0]
             self.ui.widget_result.clearContents()
             self.gv_visual_data_content1.axes.cla()
-            self.gv_visual_data_content1.axes.set_xlim(self.rect_x[0], self.rect_x[1])
-            self.gv_visual_data_content1.axes.set_ylim(self.rect_y[0], self.rect_y[1])
-            self.gv_visual_data_content1.axes.plot(self.x, self.y)
+
+            self.gv_visual_data_content1.axes.plot(self._x_plot, self._y_plot,)
             self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
         if self.ptp_distance is None:
             self.ui.func1.setEnabled(True)

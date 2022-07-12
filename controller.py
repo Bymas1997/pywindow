@@ -30,3 +30,8 @@ class Controller:
     def measure_depth(marked_x, marked_y, marked_data, ptp_distance):
         depth_point, drop_foot_x, drop_foot_y, depth_max = Measure.depth(marked_x, marked_y, marked_data, ptp_distance)
         return depth_point, drop_foot_x, drop_foot_y, depth_max
+
+    @staticmethod
+    def roi_select(x, y):
+        x, y, miss = Measure.roi(x, y)
+        return x, y, miss
