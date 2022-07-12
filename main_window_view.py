@@ -8,7 +8,6 @@ import time
 import typing as t
 from threading import Thread
 
-
 import numpy as np
 import xlwt
 
@@ -282,16 +281,16 @@ class Stats(QMainWindow):
                     self.rect_x[1] >= i[0] >= self.rect_x[0] and self.rect_y[1] >= i[1] >= self.rect_y[0]]
         x, y = zip(*roi_data)
         self._x_plot, self._y_plot, miss = Controller.roi_select(x, y)
-        print(self._x_plot, self._y_plot)
-        if self._x_plot != 'fail':
+        if self._x_plot == 'fail':
+            QMessageBox.information(self, 'error', '请重新选择')
+
+        else:
             if miss:
 
                 self.gv_visual_data_content1.axes.plot(self._x_plot, self._y_plot)
                 self.gv_visual_data_content1.draw_idle()
             else:
                 QMessageBox.information(self, 'error', 'roi选择错误')
-        else:
-            QMessageBox.information(self, 'error', '请重新选择')
 
         # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
         # 通过列表递推式将选择的矩形范围作为约束条件，对原始数据进行筛选选区数据
@@ -301,7 +300,7 @@ class Stats(QMainWindow):
 
     def pick(self):  # func1
 
-        self.gv_visual_data_content1.axes.scatter(self._x_plot, self._y_plot, picker=1, s=0.001)
+        self.gv_visual_data_content1.axes.scatter(self._x_plot, self._y_plot, picker=2, s=0.001)
         self.gv_visual_data_content1.mpl_connect('pick_event', self._pick)
 
     def _pick(self, event):
@@ -380,7 +379,7 @@ class Stats(QMainWindow):
     def delete(self):
         self.ui.widget_result.clearContents()
         self.gv_visual_data_content1.axes.cla()
-        self.gv_visual_data_content1.axes.plot(self._x_plot, self._y_plot,)
+        self.gv_visual_data_content1.axes.plot(self._x_plot, self._y_plot, )
 
         self.gv_visual_data_content1.draw_idle()
         self.cln_data()
@@ -388,6 +387,7 @@ class Stats(QMainWindow):
             self.ui.func1.setEnabled(True)
 
     def save(self):
+        # TODO:
 
         filenames, _ = QFileDialog.getSaveFileName(self, caption='保存文件', dir='', filter=".xls(*.xls)")
         wbk = xlwt.Workbook()
@@ -406,7 +406,7 @@ class Stats(QMainWindow):
             self.ui.widget_result.clearContents()
             self.ui.widget_result.setItem(0, 0, QTableWidgetItem(str(self.marked_x[0]) + ',' + str(self.marked_y[0])))
             self.gv_visual_data_content1.axes.cla()
-            self.gv_visual_data_content1.axes.plot(self._x_plot, self._y_plot,)
+            self.gv_visual_data_content1.axes.plot(self._x_plot, self._y_plot, )
             self.gv_visual_data_content1.axes.plot(self.marked_x[0], self.marked_y[0], '.r')
             self.gv_visual_data_content1.axes.text(self.marked_x[0], self.marked_y[0],
                                                    str(self.marked_x[0]) + '  ' + str(
@@ -419,7 +419,7 @@ class Stats(QMainWindow):
             self.ui.widget_result.clearContents()
             self.gv_visual_data_content1.axes.cla()
 
-            self.gv_visual_data_content1.axes.plot(self._x_plot, self._y_plot,)
+            self.gv_visual_data_content1.axes.plot(self._x_plot, self._y_plot, )
             self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
         if self.ptp_distance is None:
             self.ui.func1.setEnabled(True)
