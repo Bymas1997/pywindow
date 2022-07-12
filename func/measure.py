@@ -72,10 +72,9 @@ class Measure:
         con = np.convolve(dot, np.hanning(40) / 20, 'same')
         target = np.intersect1d(np.argwhere(3.6 < con).flatten(), np.argwhere(4.4 > con).flatten())
         target_diff = np.diff(target)
-        print(target)
-        print(target_diff)
         count = 1
         _count = 0
+        _miss = True
         for i in target_diff:
             if 4 > i > 0:
                 count += 1
@@ -84,11 +83,11 @@ class Measure:
                 _count += 1
                 if _count == 1:
 
-                    j = (y[target[count]]-y[target[0]])/( x[target[count]]-x[target[0]])
+                    j = (y[target[count]] - y[target[0]]) / (x[target[count]] - x[target[0]])
                     if j > 0:
-                        miss = False
+                        _miss = False
                     else:
-                        miss = True
+                        _miss = True
 
                 else:
                     pass
@@ -101,4 +100,4 @@ class Measure:
             x_plot = 'fail'
             y_plot = 'fail'
 
-        return x_plot, y_plot, miss
+        return x_plot, y_plot, _miss

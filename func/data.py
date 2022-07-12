@@ -10,7 +10,7 @@ class File_Loader(object):
         with open(self.name, 'r') as f:  # 以只读形式打开某.txt文件
             for line in f:
                 lnum += 1
-                if lnum >= 0:  # 从第四行开始添加数据
+                if lnum >= 0:
                     line = line.strip('\n')  # 去掉换行符
                     line = line.split('\t')  # 分割掉两列数据之间的制表符
                     x.append(line[0])
