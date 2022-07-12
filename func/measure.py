@@ -94,8 +94,8 @@ class Measure:
             if _count == 3:
                 break
         if _count == 3:
-            x_plot = x[target[0] - 4:target[count] + 4]
-            y_plot = y[target[0] - 4:target[count] + 4]
+            x_plot = x[target[0] - 4:target[count] + 30]
+            y_plot = y[target[0] - 4:target[count] + 30]
         else:
             x_plot = 'fail'
             y_plot = 'fail'
