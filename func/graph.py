@@ -1,5 +1,7 @@
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+
 
 
 class MyFigureCanvas(FigureCanvas):
@@ -11,7 +13,7 @@ class MyFigureCanvas(FigureCanvas):
         FigureCanvas.__init__(self, fig)  # 初始化父类
         self.setParent(parent)
 
-        self.axes = fig.add_subplot(111)  # 添加子图
+        self.axes = fig.add_subplot(111, projection='3d')  # 添加子图
         self.axes.spines['top'].set_visible(False)
         self.axes.spines['right'].set_visible(False)
         self.axes.set_xlim(xlim)

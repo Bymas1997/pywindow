@@ -9,7 +9,8 @@ class Controller:
         mydata = File_Loader(filename)
         x = mydata.x
         y = mydata.y
-        return x, y
+        z = mydata.z
+        return x, y, z
 
     @staticmethod
     def pick_point(x, y, ind):
