@@ -41,6 +41,7 @@ class Stats(QMainWindow):
         self.marked_y = []
         self._x_plot = None
         self._y_plot = None
+        self._z_plot = None
 
         self.ptp_distance = None
         self.gv_visual_data_content = MyFigureCanvas(width=self.ui.graphicsView.width() / 101,
@@ -83,12 +84,12 @@ class Stats(QMainWindow):
         # Signal
         self.ui.file.clicked.connect(self.file)
         self.ui.func1.clicked.connect(self.pick)
-        self.ui.func2.clicked.connect(self._depth)
-        self.ui.func3.clicked.connect(self._area)
-        self.ui.delete_2.clicked.connect(self.delete)
-        self.ui.save.clicked.connect(self.save)
+        # self.ui.func2.clicked.connect(self._depth)
+        # self.ui.func3.clicked.connect(self._area)
+        # self.ui.delete_2.clicked.connect(self.delete)
+        # self.ui.save.clicked.connect(self.save)
         self.ui.setting.clicked.connect(self.system_settings)
-        self.ui.back.clicked.connect(self.back)
+        # self.ui.back.clicked.connect(self.back)
         self.ui.realtime_monitor.clicked.connect(self.monitor)
         self._signal.connect(self._render_func)
         self.ui.Traking.clicked.connect(self.tracking)
@@ -244,48 +245,52 @@ class Stats(QMainWindow):
     def plot_data(self):
 
         # self.gv_visual_data_content.axes.set_ylim(-8, 8)
-        self.gv_visual_data_content.axes.plot3D(self.x, self.y, self.z, ':')
-        # self.gv_visual_data_content.axes.add_patch(self.rect)  # 添加选框范围矩形到画布, 这里需要先初始化一个矩形，后面只需对该矩形矩形参数重设即可让矩形动起来。
+        # self.gv_visual_data_content.axes.plot3D(self.x, self.y, self.z, ':')
+        # # self.gv_visual_data_content.axes.add_patch(self.rect)  # 添加选框范围矩形到画布, 这里需要先初始化一个矩形，后面只需对该矩形矩形参数重设即可让矩形动起来。
+        #
+        # self.ui.func1.setEnabled(True)
+        # self.gv_visual_data_content.draw_idle()
 
-        self.ui.func1.setEnabled(True)
+        # def press(self, event):  # 鼠标在原始画布上按下将会被调用的函数，该函数获取鼠标按下的坐标
+        #     self.startx = event.x
+        #     self.starty = event.x
+        #
+        # def release(self, event):  # 鼠标在原始画布上释放将会被调用的函数，该函数获取鼠标按下的坐标， 同时处理获取局部图像事务
+        #     self.endx = event.x
+        #     self.endy = event.x
+        #
+        #     # 鼠标按下释放后获取选取的矩形范围
+        #
+        #     self.rect_x = self.gv_visual_data_content.axes.get_xlim()
+        #     self.rect_y = self.gv_visual_data_content.axes.get_ylim()
+        #
+        #     # 如果鼠标按下释放都是同一点，那么此时不出现选择的矩形框（即矩形的起点与宽高都全部设置为0），反之则设置矩形的坐标范围
+        #     if self.startx == self.endx and self.starty == self.endy:
+        #         self.rect.set_x(0)
+        #         self.rect.set_y(0)
+        #         self.rect.set_width(0)
+        #         self.rect.set_height(0)
+        #     else:
+        #         self.rect.set_x(self.rect_x[0])
+        #         self.rect.set_y(self.rect_y[0])
+        #         self.rect.set_width(self.rect_x[1] - self.rect_x[0])
+        #         self.rect.set_height(self.rect_y[1] - self.rect_y[0])
+        #
+        #     # 由于前面选取矩形后，原始图像的坐标轴范围发生了变化，下面代码我们通过将前面存储的原始图像坐标轴范围设置，从而达到恢复原始图像坐标轴的目的，同时保留了选取的矩形框
+        #     self.gv_visual_data_content.axes.set_xlim(self.xlim)
+        #     self.gv_visual_data_content.axes.set_ylim(self.ylim)
+        #     # 我们对原始图像坐标轴约束在选取的矩形坐标范围，即右边局部图像
+        #     self.gv_visual_data_content1.axes.cla()
+        roi_data = [i for i in zip(self.x, self.y, self.z) if i]
+        x, y, z = zip(*roi_data)
+
+        a = Controller.roi_select(x, y, z)
+        print(a)
+        self.gv_visual_data_content.axes.plot3D(x[477600:550399],y[477600:550399],z[477600:550399], ':')
         self.gv_visual_data_content.draw_idle()
+        # if self._x_plot == 'fail' or self._x_plot == ():
+        #     QMessageBox.information(self, 'error', '请重新选择')
 
-    # def press(self, event):  # 鼠标在原始画布上按下将会被调用的函数，该函数获取鼠标按下的坐标
-    #     self.startx = event.x
-    #     self.starty = event.x
-    #
-    # def release(self, event):  # 鼠标在原始画布上释放将会被调用的函数，该函数获取鼠标按下的坐标， 同时处理获取局部图像事务
-    #     self.endx = event.x
-    #     self.endy = event.x
-    #
-    #     # 鼠标按下释放后获取选取的矩形范围
-    #
-    #     self.rect_x = self.gv_visual_data_content.axes.get_xlim()
-    #     self.rect_y = self.gv_visual_data_content.axes.get_ylim()
-    #
-    #     # 如果鼠标按下释放都是同一点，那么此时不出现选择的矩形框（即矩形的起点与宽高都全部设置为0），反之则设置矩形的坐标范围
-    #     if self.startx == self.endx and self.starty == self.endy:
-    #         self.rect.set_x(0)
-    #         self.rect.set_y(0)
-    #         self.rect.set_width(0)
-    #         self.rect.set_height(0)
-    #     else:
-    #         self.rect.set_x(self.rect_x[0])
-    #         self.rect.set_y(self.rect_y[0])
-    #         self.rect.set_width(self.rect_x[1] - self.rect_x[0])
-    #         self.rect.set_height(self.rect_y[1] - self.rect_y[0])
-    #
-    #     # 由于前面选取矩形后，原始图像的坐标轴范围发生了变化，下面代码我们通过将前面存储的原始图像坐标轴范围设置，从而达到恢复原始图像坐标轴的目的，同时保留了选取的矩形框
-    #     self.gv_visual_data_content.axes.set_xlim(self.xlim)
-    #     self.gv_visual_data_content.axes.set_ylim(self.ylim)
-    #     # 我们对原始图像坐标轴约束在选取的矩形坐标范围，即右边局部图像
-    #     self.gv_visual_data_content1.axes.cla()
-    #     roi_data = [i for i in zip(self.x, self.y) if
-    #                 self.rect_x[1] >= i[0] >= self.rect_x[0] and self.rect_y[1] >= i[1] >= self.rect_y[0]]
-    #     x, y = zip(*roi_data)
-    #     self._x_plot, self._y_plot, miss = Controller.roi_select(x, y)
-    #     if self._x_plot == 'fail' or self._x_plot == ():
-    #         QMessageBox.information(self, 'error', '请重新选择')
     #
     #     else:
     #         if miss:
@@ -358,85 +363,85 @@ class Stats(QMainWindow):
             # self.gv_visual_data_content.draw_idle()
             # print(self.x) TODO:
 
-    def _area(self):  # func3
-        area_data, area_plot = Controller.measure_area(self.marked_x, self.marked_y, self.marked_data)
-
-        self.gv_visual_data_content1.axes.text((self.marked_x[0] + self.marked_x[1]) / 2,
-                                               (self.marked_y[0] + self.marked_y[1] - 0.7) / 2, area_plot)
-        self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
-        self.ui.widget_result.setItem(0, 3, QTableWidgetItem(area_data))
-
-    def _depth(self):
-        depth_point, drop_foot_x, drop_foot_y, depth_max = Controller.measure_depth(self.marked_x,
-                                                                                    self.marked_y,
-                                                                                    self.marked_data,
-                                                                                    self.ptp_distance)
-
-        self.gv_visual_data_content1.axes.plot([depth_point[0], drop_foot_x], [depth_point[1], drop_foot_y])
-        print(depth_point)
-        print(drop_foot_x, drop_foot_y)
-        depth_plot = 'dp :' + str(depth_max)
-        self.ui.widget_result.setItem(0, 4, QTableWidgetItem(str(depth_max)))
-        self.gv_visual_data_content1.axes.text((self.marked_x[0] + self.marked_x[1]) / 2,
-                                               (self.marked_y[0] + self.marked_y[1] - 0.8) / 2, depth_plot)
-
-        # self.gv_visual_data_content1.axes.set_aspect(1)
-
-        self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
-
-    def cln_data(self):  # 清空數據
-
-        self.marked_x = []
-        self.marked_y = []
-        self.ptp_distance = None
-
-    def delete(self):
-        self.ui.widget_result.clearContents()
-        self.gv_visual_data_content1.axes.cla()
-        self.gv_visual_data_content1.axes.plot(self._x_plot, self._y_plot, )
-
-        self.gv_visual_data_content1.draw_idle()
-        self.cln_data()
-        if self.ptp_distance is None:
-            self.ui.func1.setEnabled(True)
-
-    def save(self):
-        # TODO:
-
-        filenames, _ = QFileDialog.getSaveFileName(self, caption='保存文件', dir='', filter=".xls(*.xls)")
-        wbk = xlwt.Workbook()
-        sheet = wbk.add_sheet("sheet", cell_overwrite_ok=True)
-        for currentColumn in range(self.ui.widget_result.columnCount()):
-            for currentRow in range(self.ui.widget_result.rowCount()):
-                teext = str(self.ui.widget_result.item(currentRow, currentColumn).text())
-                sheet.write(currentRow, currentColumn, teext)
-        wbk.save(filenames)
-
-    def back(self):
-        if len(self.marked_x) == 2:
-            del self.marked_x[1]
-            del self.marked_y[1]
-
-            self.ui.widget_result.clearContents()
-            self.ui.widget_result.setItem(0, 0, QTableWidgetItem(str(self.marked_x[0]) + ',' + str(self.marked_y[0])))
-            self.gv_visual_data_content1.axes.cla()
-            self.gv_visual_data_content1.axes.plot(self._x_plot, self._y_plot, )
-            self.gv_visual_data_content1.axes.plot(self.marked_x[0], self.marked_y[0], '.r')
-            self.gv_visual_data_content1.axes.text(self.marked_x[0], self.marked_y[0],
-                                                   str(self.marked_x[0]) + '  ' + str(
-                                                       self.marked_y[0]) + '\n' + '\n')  # 打印选定数据点
-            self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
-            self.ptp_distance = None
-        elif len(self.marked_x) == 1:
-            del self.marked_x[0]
-            del self.marked_y[0]
-            self.ui.widget_result.clearContents()
-            self.gv_visual_data_content1.axes.cla()
-
-            self.gv_visual_data_content1.axes.plot(self._x_plot, self._y_plot, )
-            self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
-        if self.ptp_distance is None:
-            self.ui.func1.setEnabled(True)
+    # def _area(self):  # func3
+    #     area_data, area_plot = Controller.measure_area(self.marked_x, self.marked_y, self.marked_data)
+    #
+    #     self.gv_visual_data_content1.axes.text((self.marked_x[0] + self.marked_x[1]) / 2,
+    #                                            (self.marked_y[0] + self.marked_y[1] - 0.7) / 2, area_plot)
+    #     self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
+    #     self.ui.widget_result.setItem(0, 3, QTableWidgetItem(area_data))
+    #
+    # def _depth(self):
+    #     depth_point, drop_foot_x, drop_foot_y, depth_max = Controller.measure_depth(self.marked_x,
+    #                                                                                 self.marked_y,
+    #                                                                                 self.marked_data,
+    #                                                                                 self.ptp_distance)
+    #
+    #     self.gv_visual_data_content1.axes.plot([depth_point[0], drop_foot_x], [depth_point[1], drop_foot_y])
+    #     print(depth_point)
+    #     print(drop_foot_x, drop_foot_y)
+    #     depth_plot = 'dp :' + str(depth_max)
+    #     self.ui.widget_result.setItem(0, 4, QTableWidgetItem(str(depth_max)))
+    #     self.gv_visual_data_content1.axes.text((self.marked_x[0] + self.marked_x[1]) / 2,
+    #                                            (self.marked_y[0] + self.marked_y[1] - 0.8) / 2, depth_plot)
+    #
+    #     # self.gv_visual_data_content1.axes.set_aspect(1)
+    #
+    #     self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
+    #
+    # def cln_data(self):  # 清空數據
+    #
+    #     self.marked_x = []
+    #     self.marked_y = []
+    #     self.ptp_distance = None
+    #
+    # def delete(self):
+    #     self.ui.widget_result.clearContents()
+    #     self.gv_visual_data_content1.axes.cla()
+    #     self.gv_visual_data_content1.axes.plot(self._x_plot, self._y_plot, )
+    #
+    #     self.gv_visual_data_content1.draw_idle()
+    #     self.cln_data()
+    #     if self.ptp_distance is None:
+    #         self.ui.func1.setEnabled(True)
+    #
+    # def save(self):
+    #     # TODO:
+    #
+    #     filenames, _ = QFileDialog.getSaveFileName(self, caption='保存文件', dir='', filter=".xls(*.xls)")
+    #     wbk = xlwt.Workbook()
+    #     sheet = wbk.add_sheet("sheet", cell_overwrite_ok=True)
+    #     for currentColumn in range(self.ui.widget_result.columnCount()):
+    #         for currentRow in range(self.ui.widget_result.rowCount()):
+    #             teext = str(self.ui.widget_result.item(currentRow, currentColumn).text())
+    #             sheet.write(currentRow, currentColumn, teext)
+    #     wbk.save(filenames)
+    #
+    # def back(self):
+    #     if len(self.marked_x) == 2:
+    #         del self.marked_x[1]
+    #         del self.marked_y[1]
+    #
+    #         self.ui.widget_result.clearContents()
+    #         self.ui.widget_result.setItem(0, 0, QTableWidgetItem(str(self.marked_x[0]) + ',' + str(self.marked_y[0])))
+    #         self.gv_visual_data_content1.axes.cla()
+    #         self.gv_visual_data_content1.axes.plot(self._x_plot, self._y_plot, )
+    #         self.gv_visual_data_content1.axes.plot(self.marked_x[0], self.marked_y[0], '.r')
+    #         self.gv_visual_data_content1.axes.text(self.marked_x[0], self.marked_y[0],
+    #                                                str(self.marked_x[0]) + '  ' + str(
+    #                                                    self.marked_y[0]) + '\n' + '\n')  # 打印选定数据点
+    #         self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
+    #         self.ptp_distance = None
+    #     elif len(self.marked_x) == 1:
+    #         del self.marked_x[0]
+    #         del self.marked_y[0]
+    #         self.ui.widget_result.clearContents()
+    #         self.gv_visual_data_content1.axes.cla()
+    #
+    #         self.gv_visual_data_content1.axes.plot(self._x_plot, self._y_plot, )
+    #         self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
+    #     if self.ptp_distance is None:
+    #         self.ui.func1.setEnabled(True)
 
 
 if __name__ == '__main__':

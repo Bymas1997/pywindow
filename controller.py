@@ -33,6 +33,6 @@ class Controller:
         return depth_point, drop_foot_x, drop_foot_y, depth_max
 
     @staticmethod
-    def roi_select(x, y):
-        x, y, miss = Measure.roi(x, y)
-        return x, y, miss
+    def roi_select(x, y, z):
+        j = Measure.abc(x, y, z)
+        return j
