@@ -57,8 +57,8 @@ class Measure:
         _n = -np.diff(y) / pow(pow(np.diff(x), 2) + pow(np.diff(y), 2), 0.5), np.diff(x) / pow(
             pow(np.diff(x), 2) + pow(np.diff(y), 2), 0.5)
         n = [i for i in zip(_n[0], _n[1])]
-        x_t = np.gradient(x)
-        y_t = np.gradient(y)
+        x_t = np.gradient(x, edge_order=2)
+        y_t = np.gradient(y, edge_order=2)
         xx_t = np.gradient(x_t)
         yy_t = np.gradient(y_t)
         curvature_val = np.abs(xx_t * y_t - x_t * yy_t) / (x_t * x_t + y_t * y_t) ** 1.5
@@ -66,40 +66,54 @@ class Measure:
         _k = np.diff(x) * cur / pow(pow(np.diff(x), 2) + pow(np.diff(y), 2), 0.5), np.diff(y) * cur / pow(
             pow(np.diff(x), 2) + pow(np.diff(y), 2), 0.5)
         k = [i for i in zip(_k[0], _k[1])]
-        k_ave = (np.cumsum(k, axis=0) / len(k))[len(k) - 1]
+        k_ave = (np.cumsum(k, axis=0) / len(k))[len(k) - 1]  # K 曲率
         k_avee = k_ave.reshape(2, 1)
         dot = abs(np.dot(n, k_avee).flatten())
         con = np.convolve(dot, np.hanning(40) / 20, 'same')
-        target = np.intersect1d(np.argwhere(3.6 < con).flatten(), np.argwhere(4.4 > con).flatten())
+        print(con)
+        target = np.intersect1d(np.argwhere(12< con).flatten(), np.argwhere(18 > con).flatten())
         target_diff = np.diff(target)
-        print(target)
-        print(target_diff)
         count = 1
         _count = 0
-        miss = True
+        _miss = True
         for i in target_diff:
             if 4 > i > 0:
                 count += 1
             else:
                 count += 1
                 _count += 1
-                if _count == 1:
-
-                    j = (y[target[count]]-y[target[0]])/( x[target[count]]-x[target[0]])
-                    if j > 0:
-                        miss = False
-                    else:
-                        miss = True
-
-                else:
-                    pass
+                # if _count == 1:
+                #
+                #     jj = (y[target[count-1]] - y[target[0]]) / (x[target[count-1]] - x[target[0]])
+                #     if jj > 0:
+                #         _miss = False
+                #     else:
+                #         _miss = True
+                #
+                # else:
+                #     pass
             if _count == 3:
                 break
         if _count == 3:
-            x_plot = x[target[0] - 4:target[count] + 4]
-            y_plot = y[target[0] - 4:target[count] + 4]
+            x_plot = x[target[0] - 4:target[count-1] + 30]
+            y_plot = y[target[0] - 4:target[count-1] + 30]
         else:
             x_plot = 'fail'
             y_plot = 'fail'
 
-        return x_plot, y_plot, miss
+        return x_plot, y_plot, _miss
+
+    @staticmethod
+    def abc(x, y, z):
+        j = []
+        n = 1
+        for i in np.arange(0, 4.794, 0.006):
+            if i >= 0:
+                qq, _, _ = Measure.roi(x[800 * (n - 1):800 * n - 1], y[800 * (n - 1):800 * n - 1])
+                if qq == 'fail' or qq == ():
+                    n += 1
+
+                else:
+                    j.append(i)
+                    n += 1
+        return j
