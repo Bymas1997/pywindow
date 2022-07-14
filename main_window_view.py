@@ -350,6 +350,51 @@ class Stats(QMainWindow):
                             -999]
         if self.ptp_distance is not None:
             self.ui.func1.setEnabled(False)
+<<<<<<< HEAD
+=======
+
+    def _area(self):  # func3
+        area_data, area_plot = Controller.measure_area(self.marked_x, self.marked_y, self.marked_data)
+
+        self.gv_visual_data_content1.axes.text((self.marked_x[0] + self.marked_x[1]) / 2,
+                                               (self.marked_y[0] + self.marked_y[1] - 0.7) / 2, area_plot)
+        self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
+        self.ui.widget_result.setItem(0, 3, QTableWidgetItem(area_data))
+
+    def _depth(self):
+        depth_point, drop_foot_x, drop_foot_y, depth_max = Controller.measure_depth(self.marked_x,
+                                                                                    self.marked_y,
+                                                                                    self.marked_data,
+                                                                                    self.ptp_distance)
+
+        self.gv_visual_data_content1.axes.plot([depth_point[0], drop_foot_x], [depth_point[1], drop_foot_y])
+        print(depth_point)
+        print(drop_foot_x, drop_foot_y)
+        depth_plot = 'dp :' + str(depth_max)
+        self.ui.widget_result.setItem(0, 4, QTableWidgetItem(str(depth_max)))
+        self.gv_visual_data_content1.axes.text((self.marked_x[0] + self.marked_x[1]) / 2,
+                                               (self.marked_y[0] + self.marked_y[1] - 0.8) / 2, depth_plot)
+
+        # self.gv_visual_data_content1.axes.set_aspect(1)
+
+        self.gv_visual_data_content1.draw_idle()  # 此行代码至关重要，若没有改行代码，右边图像将无法随矩形选区更新，改行代码起实时更新作用
+
+    def cln_data(self):  # 清空數據
+
+        self.marked_x = []
+        self.marked_y = []
+        self.ptp_distance = None
+
+    def delete(self):
+        self.ui.widget_result.clearContents()
+        self.gv_visual_data_content1.axes.cla()
+        self.gv_visual_data_content1.axes.plot(self._x_plot, self._y_plot, )
+
+        self.gv_visual_data_content1.draw_idle()
+        self.cln_data()
+        if self.ptp_distance is None:
+            self.ui.func1.setEnabled(True)
+>>>>>>> parent of d9c059d (2022.7.13)
 
     # def _area(self):  # func3
     #     area_data, area_plot = Controller.measure_area(self.marked_x, self.marked_y, self.marked_data)
