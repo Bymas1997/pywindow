@@ -350,18 +350,6 @@ class Stats(QMainWindow):
                             -999]
         if self.ptp_distance is not None:
             self.ui.func1.setEnabled(False)
-            # a = self.x.index(self.marked_x[0])
-            # b = self.x.index(self.marked_x[1])
-            #
-            # del self.x[a:b]
-            # del self.y[a:b]
-            # x_smooth = np.linspace(min(self.x), max(self.x), 30000)
-            # y_smooth = make_interp_spline(self.x, self.y)(x_smooth)
-            # self.gv_visual_data_content.axes.cla()
-            # self.gv_visual_data_content.axes.set_ylim(-8, 8)
-            # self.gv_visual_data_content.axes.plot(x_smooth, y_smooth)
-            # self.gv_visual_data_content.draw_idle()
-            # print(self.x) TODO:
 
     # def _area(self):  # func3
     #     area_data, area_plot = Controller.measure_area(self.marked_x, self.marked_y, self.marked_data)
